@@ -48,15 +48,20 @@ function getProductIcon(category = '', name = '') {
 
 const FALLBACK_ARTWORKS = [
   '/red_mousepad.jpg',
-  '/Sakura Landscape Mousepad Mountain Pink White Mouse Pad Rubber Bottom Game Pad Office accessories.jpg',
-  '/Wave MTG gaming mat, dragon 350x600x2mm mouse pad MTG MTG DTCG CCG RPG, collection card, soft rubber.jpg',
+  '/sakura-mousepad.jpg',
+  '/dragon-wave-mousepad.jpg',
   '/jjk_mousepad.jpg',
-  '/Zindoo XXL Gaming Mouse Mat 900 x 400 mm.jpg',
+  '/tactical-mousepad.jpg',
 ];
 
 function getProductImage(product) {
   if (product.images && product.images.length > 0 && product.images[0]) {
-    return product.images[0];
+    let img = product.images[0];
+    if (img.includes('Sakura Landscape')) return '/sakura-mousepad.jpg';
+    if (img.includes('Wave MTG')) return '/dragon-wave-mousepad.jpg';
+    if (img.includes('Zindoo XXL')) return '/tactical-mousepad.jpg';
+    if (img.toLowerCase().includes('hero_upscaled')) return '/hero-upscaled.jpeg';
+    return img;
   }
   const key = `${product.slug || ''} ${product.name || ''} ${product.id || ''}`;
   let hash = 0;

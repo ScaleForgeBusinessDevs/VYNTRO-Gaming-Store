@@ -10,10 +10,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 const PLACEHOLDER_PRODUCTS = [
   { id: '1', name: 'Midnight Black XL', slug: 'midnight-black-xl', selling_price: 2499, discount_percentage: 0, stock_quantity: 12, images: ['/red_mousepad.jpg'], category: 'XXL Deskmats' },
-  { id: '2', name: 'Arctic White Pro', slug: 'arctic-white-pro', selling_price: 2999, discount_percentage: 20, stock_quantity: 4, images: ['/Sakura Landscape Mousepad Mountain Pink White Mouse Pad Rubber Bottom Game Pad Office accessories.jpg'], category: 'XXL Deskmats' },
-  { id: '3', name: 'RGB Horizon Mat', slug: 'rgb-horizon-mat', selling_price: 3499, discount_percentage: 0, stock_quantity: 8, images: ['/Wave MTG gaming mat, dragon 350x600x2mm mouse pad MTG MTG DTCG CCG RPG, collection card, soft rubber.jpg'], category: 'RGB Deskmats' },
+  { id: '2', name: 'Arctic White Pro', slug: 'arctic-white-pro', selling_price: 2999, discount_percentage: 20, stock_quantity: 4, images: ['/sakura-mousepad.jpg'], category: 'XXL Deskmats' },
+  { id: '3', name: 'RGB Horizon Mat', slug: 'rgb-horizon-mat', selling_price: 3499, discount_percentage: 0, stock_quantity: 8, images: ['/dragon-wave-mousepad.jpg'], category: 'RGB Deskmats' },
   { id: '4', name: 'Galaxy Dragon Bundle', slug: 'galaxy-bundle', selling_price: 4999, discount_percentage: 15, stock_quantity: 5, images: ['/jjk_mousepad.jpg'], category: 'Bundles' },
-  { id: '5', name: 'Stealth Tactical XXL', slug: 'stealth-tactical-xxl', selling_price: 2799, discount_percentage: 0, stock_quantity: 14, images: ['/Zindoo XXL Gaming Mouse Mat 900 x 400 mm.jpg'], category: 'XXL Deskmats' },
+  { id: '5', name: 'Stealth Tactical XXL', slug: 'stealth-tactical-xxl', selling_price: 2799, discount_percentage: 0, stock_quantity: 14, images: ['/tactical-mousepad.jpg'], category: 'XXL Deskmats' },
 ];
 
 export default function BestSellers() {

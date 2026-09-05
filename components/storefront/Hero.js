@@ -28,11 +28,11 @@ export default function Hero() {
       <div className={styles.visualContainer} ref={visualRef}>
         <div className={styles.imageWrapper}>
           <Image
-            src="/hero_upscaled.jpeg"
+            src="/hero-upscaled.jpeg"
             alt="VYNTRO - YOUR SETUP. YOUR ADVANTAGE. Custom Mousepads, Premium Gear"
             fill
             priority
-            quality={100}
+            unoptimized
             sizes="100vw"
             className={styles.heroImage}
           />

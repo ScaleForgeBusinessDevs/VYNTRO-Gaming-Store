@@ -141,7 +141,17 @@ export default function ProductPage() {
               <div className={styles.mainImg}>
                 {product.images?.[gallery] ? (
                   <Image
-                    src={product.images[gallery]}
+                    src={
+                      product.images[gallery].includes('Sakura Landscape')
+                        ? '/sakura-mousepad.jpg'
+                        : product.images[gallery].includes('Wave MTG')
+                        ? '/dragon-wave-mousepad.jpg'
+                        : product.images[gallery].includes('Zindoo XXL')
+                        ? '/tactical-mousepad.jpg'
+                        : product.images[gallery].toLowerCase().includes('hero_upscaled')
+                        ? '/hero-upscaled.jpeg'
+                        : product.images[gallery]
+                    }
                     alt={product.name}
                     fill
                     style={{ objectFit: 'cover' }}
@@ -161,16 +171,27 @@ export default function ProductPage() {
               {/* Thumbnails */}
               {product.images?.length > 1 && (
                 <div className={styles.thumbs}>
-                  {product.images.map((img, i) => (
-                    <button
-                      key={i}
-                      className={`${styles.thumb} ${gallery === i ? styles.thumbActive : ''}`}
-                      onClick={() => setGallery(i)}
-                      aria-label={`Image ${i + 1}`}
-                    >
-                      <Image src={img} alt="" fill style={{ objectFit: 'cover' }} />
-                    </button>
-                  ))}
+                  {product.images.map((img, i) => {
+                    const cleanSrc = img.includes('Sakura Landscape')
+                      ? '/sakura-mousepad.jpg'
+                      : img.includes('Wave MTG')
+                      ? '/dragon-wave-mousepad.jpg'
+                      : img.includes('Zindoo XXL')
+                      ? '/tactical-mousepad.jpg'
+                      : img.toLowerCase().includes('hero_upscaled')
+                      ? '/hero-upscaled.jpeg'
+                      : img;
+                    return (
+                      <button
+                        key={i}
+                        className={`${styles.thumb} ${gallery === i ? styles.thumbActive : ''}`}
+                        onClick={() => setGallery(i)}
+                        aria-label={`Image ${i + 1}`}
+                      >
+                        <Image src={cleanSrc} alt="" fill style={{ objectFit: 'cover' }} />
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
