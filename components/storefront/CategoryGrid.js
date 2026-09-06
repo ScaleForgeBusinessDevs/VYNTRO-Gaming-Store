@@ -25,7 +25,7 @@ const CATEGORIES = [
     id: 'mice',
     label: 'MICE',
     href: '/mice',
-    bg: '/tactical-mousepad.jpg',
+    bg: '/mouse_cat.jpg',
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="6" y="3" width="12" height="18" rx="6" />
@@ -38,7 +38,7 @@ const CATEGORIES = [
     id: 'keyboards',
     label: 'KEYBOARDS',
     href: '/keyboards',
-    bg: '/dragon-wave-mousepad.jpg',
+    bg: '/keyboard_cat.jpg',
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="6" width="20" height="12" rx="2" />
@@ -50,7 +50,7 @@ const CATEGORIES = [
     id: 'iems',
     label: 'IEMS',
     href: '/iems',
-    bg: '/sakura-mousepad.jpg',
+    bg: '/IEMs_cat.jpg',
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" />
@@ -61,7 +61,7 @@ const CATEGORIES = [
     id: 'accessories',
     label: 'ACCESSORIES',
     href: '/accessories',
-    bg: '/jjk_mousepad.jpg',
+    bg: '/ARM_cat.jpg',
     icon: (
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="3" />
