@@ -3,7 +3,7 @@ import { useState } from 'react';
 import styles from './Newsletter.module.css';
 
 export default function Newsletter() {
-  const [email, setEmail]       = useState('');
+  const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
@@ -65,7 +65,7 @@ export default function Newsletter() {
                       id="newsletter-wa"
                       type="tel"
                       className={styles.input}
-                      placeholder="+92 300 0000000"
+                      placeholder="+923363791538"
                       value={whatsapp}
                       onChange={(e) => setWhatsapp(e.target.value)}
                       autoComplete="tel"

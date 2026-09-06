@@ -24,17 +24,10 @@ export default function AdminOrdersPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { getSupabase } = await import('@/lib/supabase');
-      const supabase = getSupabase();
-      let q = supabase
-        .from('orders')
-        .select('id, order_number, status, total_amount, total_cogs, profit_margin, created_at, customers(id, name, phone, email)')
-        .order('created_at', { ascending: false });
-
-      if (filterStatus !== 'All') q = q.eq('status', filterStatus);
-
-      const { data } = await q;
-      const list = data || [];
+      const url = filterStatus !== 'All' ? `/api/orders?status=${filterStatus}` : '/api/orders';
+      const res = await fetch(url);
+      const json = await res.json();
+      const list = json.orders || [];
 
       // Detect returning customers (email appears more than once)
       const emailCounts = {};

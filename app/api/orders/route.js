@@ -1,11 +1,42 @@
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabaseAdmin';
+import { getServiceSupabase } from '@/lib/supabaseAdmin';
 
 // Generate a short readable order number
 function generateOrderNumber() {
   const ts   = Date.now().toString(36).toUpperCase();
   const rand = Math.random().toString(36).substring(2, 5).toUpperCase();
   return `VYN-${ts}-${rand}`;
+}
+
+export async function GET(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get('status');
+    const limit = searchParams.get('limit');
+    const dateFrom = searchParams.get('dateFrom');
+
+    const supabase = getServiceSupabase();
+    let q = supabase
+      .from('orders')
+      .select('id, order_number, status, total_amount, total_cogs, profit_margin, notes, created_at, updated_at, customers(id, name, phone, email, city, address)')
+      .order('created_at', { ascending: false });
+
+    if (status && status !== 'All') {
+      q = q.eq('status', status);
+    }
+    if (dateFrom) {
+      q = q.gte('created_at', dateFrom);
+    }
+    if (limit) {
+      q = q.limit(parseInt(limit));
+    }
+
+    const { data, error } = await q;
+    if (error) throw error;
+    return NextResponse.json({ orders: data || [] });
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
 
 export async function POST(request) {
@@ -28,7 +59,7 @@ export async function POST(request) {
       return NextResponse.json({ order_number: orderNumber, demo: true }, { status: 201 });
     }
 
-    const supabase = await createAdminClient();
+    const supabase = getServiceSupabase();
 
     // --- Upsert customer (match on email) ---
     let customerId;

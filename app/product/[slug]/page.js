@@ -435,8 +435,8 @@ export default function ProductPage() {
                 {added
                   ? '✓ ADDED'
                   : product.stock_quantity === 0
-                  ? 'OUT OF STOCK'
-                  : 'ADD TO CART'}
+                    ? 'OUT OF STOCK'
+                    : 'ADD TO CART'}
               </button>
             </div>
 
@@ -449,7 +449,7 @@ export default function ProductPage() {
 
             {/* WhatsApp */}
             <a
-              href={`https://wa.me/923000000000?text=${encodeURIComponent(waMessage)}`}
+              href={`https://wa.me/923363791538?text=${encodeURIComponent(waMessage)}`}
               target="_blank"
               rel="noopener noreferrer"
               className={styles.waBtn}

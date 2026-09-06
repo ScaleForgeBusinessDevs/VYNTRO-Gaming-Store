@@ -11,24 +11,24 @@ import styles from './bundle.module.css';
 
 /* ── Fallback product catalog (mirrors shop/page.js) ── */
 const PLACEHOLDER_PRODUCTS = [
-  { id: '1',  name: 'Midnight Black XL',             slug: 'midnight-black-xl',      selling_price: 2499,  discount_percentage: 0,  stock_quantity: 12, images: ['/red_mousepad.jpg'],          category: 'XXL Deskmats',  description: 'The Midnight Black XL is our flagship deskmat.' },
-  { id: '2',  name: 'Arctic White Pro',              slug: 'arctic-white-pro',       selling_price: 2999,  discount_percentage: 20, stock_quantity: 4,  images: ['/tactical-mousepad.jpg'],     category: 'XXL Deskmats',  description: 'Clean, minimal, and built for precision.' },
-  { id: '3',  name: 'RGB Horizon Mat',               slug: 'rgb-horizon-mat',        selling_price: 3499,  discount_percentage: 0,  stock_quantity: 8,  images: ['/dragon-wave-mousepad.jpg'], category: 'RGB Deskmats',  description: 'Vivid RGB lighting meets premium surface.' },
-  { id: '5',  name: 'Stealth Grey XXL',              slug: 'stealth-grey-xxl',       selling_price: 2799,  discount_percentage: 0,  stock_quantity: 20, images: ['/tactical-mousepad.jpg'],     category: 'XXL Deskmats',  description: 'Low-profile, matte-grey stealth aesthetic.' },
-  { id: '6',  name: 'Cyber Violet RGB',              slug: 'cyber-violet-rgb',       selling_price: 3799,  discount_percentage: 10, stock_quantity: 6,  images: ['/dragon-wave-mousepad.jpg'], category: 'RGB Deskmats',  description: 'Electric violet RGB with buttery smooth surface.' },
-  { id: '7',  name: 'Cloud Ergonomic Wrist Rest',   slug: 'wrist-comfort-pro',      selling_price: 1299,  discount_percentage: 0,  stock_quantity: 15, images: ['/sakura-mousepad.jpg'],       category: 'Wrist Rests',   description: 'Memory-foam wrist rest for all-day sessions.' },
-  { id: '9',  name: 'Vortex Ultra-Light Mouse',     slug: 'vortex-wireless-mouse',  selling_price: 7999,  discount_percentage: 10, stock_quantity: 8,  images: ['/mouse_cat.jpg'],             category: 'Mice',          description: '58g wireless mouse built for speed.' },
-  { id: '10', name: 'Spectre 65% HE Keyboard',      slug: 'spectre-he-keyboard',    selling_price: 14999, discount_percentage: 0,  stock_quantity: 5,  images: ['/keyboard_cat.jpg'],          category: 'Keyboards',     description: 'Hall-Effect switches, magnetic actuation.' },
-  { id: '11', name: 'Aether Gaming IEMs',           slug: 'aether-gaming-iems',     selling_price: 4999,  discount_percentage: 15, stock_quantity: 10, images: ['/IEMs_cat.jpg'],              category: 'IEMs',          description: 'Dual-driver IEMs for audiophile-grade gaming audio.' },
-  { id: '12', name: 'Coiled Aviator USB-C Cable',   slug: 'coiled-aviator-cable',   selling_price: 1899,  discount_percentage: 0,  stock_quantity: 25, images: ['/ARM_cat.jpg'],               category: 'Accessories',   description: 'Premium braided coiled cable with aviator connector.' },
+  { id: '1', name: 'Midnight Black XL', slug: 'midnight-black-xl', selling_price: 2499, discount_percentage: 0, stock_quantity: 12, images: ['/red_mousepad.jpg'], category: 'XXL Deskmats', description: 'The Midnight Black XL is our flagship deskmat.' },
+  { id: '2', name: 'Arctic White Pro', slug: 'arctic-white-pro', selling_price: 2999, discount_percentage: 20, stock_quantity: 4, images: ['/tactical-mousepad.jpg'], category: 'XXL Deskmats', description: 'Clean, minimal, and built for precision.' },
+  { id: '3', name: 'RGB Horizon Mat', slug: 'rgb-horizon-mat', selling_price: 3499, discount_percentage: 0, stock_quantity: 8, images: ['/dragon-wave-mousepad.jpg'], category: 'RGB Deskmats', description: 'Vivid RGB lighting meets premium surface.' },
+  { id: '5', name: 'Stealth Grey XXL', slug: 'stealth-grey-xxl', selling_price: 2799, discount_percentage: 0, stock_quantity: 20, images: ['/tactical-mousepad.jpg'], category: 'XXL Deskmats', description: 'Low-profile, matte-grey stealth aesthetic.' },
+  { id: '6', name: 'Cyber Violet RGB', slug: 'cyber-violet-rgb', selling_price: 3799, discount_percentage: 10, stock_quantity: 6, images: ['/dragon-wave-mousepad.jpg'], category: 'RGB Deskmats', description: 'Electric violet RGB with buttery smooth surface.' },
+  { id: '7', name: 'Cloud Ergonomic Wrist Rest', slug: 'wrist-comfort-pro', selling_price: 1299, discount_percentage: 0, stock_quantity: 15, images: ['/sakura-mousepad.jpg'], category: 'Wrist Rests', description: 'Memory-foam wrist rest for all-day sessions.' },
+  { id: '9', name: 'Vortex Ultra-Light Mouse', slug: 'vortex-wireless-mouse', selling_price: 7999, discount_percentage: 10, stock_quantity: 8, images: ['/mouse_cat.jpg'], category: 'Mice', description: '58g wireless mouse built for speed.' },
+  { id: '10', name: 'Spectre 65% HE Keyboard', slug: 'spectre-he-keyboard', selling_price: 14999, discount_percentage: 0, stock_quantity: 5, images: ['/keyboard_cat.jpg'], category: 'Keyboards', description: 'Hall-Effect switches, magnetic actuation.' },
+  { id: '11', name: 'Aether Gaming IEMs', slug: 'aether-gaming-iems', selling_price: 4999, discount_percentage: 15, stock_quantity: 10, images: ['/IEMs_cat.jpg'], category: 'IEMs', description: 'Dual-driver IEMs for audiophile-grade gaming audio.' },
+  { id: '12', name: 'Coiled Aviator USB-C Cable', slug: 'coiled-aviator-cable', selling_price: 1899, discount_percentage: 0, stock_quantity: 25, images: ['/ARM_cat.jpg'], category: 'Accessories', description: 'Premium braided coiled cable with aviator connector.' },
 ];
 
 function getProductImage(p) {
   if (p.images?.[0]) {
     const img = p.images[0];
     if (img.includes('Sakura Landscape')) return '/sakura-mousepad.jpg';
-    if (img.includes('Wave MTG'))        return '/dragon-wave-mousepad.jpg';
-    if (img.includes('Zindoo XXL'))      return '/tactical-mousepad.jpg';
+    if (img.includes('Wave MTG')) return '/dragon-wave-mousepad.jpg';
+    if (img.includes('Zindoo XXL')) return '/tactical-mousepad.jpg';
     return img;
   }
   return '/red_mousepad.jpg';
@@ -119,8 +119,8 @@ export default function BundlePage() {
 
   /* ── Pricing calculations ── */
   const retailTotal = products.reduce((sum, p) => sum + p.selling_price, 0);
-  const savings     = retailTotal - bundle.bundlePrice;
-  const savingsPct  = Math.round((savings / retailTotal) * 100);
+  const savings = retailTotal - bundle.bundlePrice;
+  const savingsPct = Math.round((savings / retailTotal) * 100);
 
   const waMessage = `Hi VYNTRO! I want to order the "${bundle.name}" bundle for PKR ${bundle.bundlePrice.toLocaleString()}. Items: ${products.map((p) => p.name).join(', ')}.`;
 
@@ -270,7 +270,7 @@ export default function BundlePage() {
               </button>
 
               <a
-                href={`https://wa.me/923000000000?text=${encodeURIComponent(waMessage)}`}
+                href={`https://wa.me/923363791538?text=${encodeURIComponent(waMessage)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-ghost"

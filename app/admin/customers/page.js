@@ -11,14 +11,10 @@ export default function AdminCustomersPage() {
     (async () => {
       setLoading(true);
       try {
-        const { getSupabase } = await import('@/lib/supabase');
-        const supabase = getSupabase();
-
-        // Fetch all customers + their order counts + total spend
-        const { data } = await supabase
-          .from('orders')
-          .select('customer_id, total_amount, customers(id, name, email, phone, city, created_at)');
-        const orders = data || [];
+        // Fetch all orders + customer info via service API
+        const res = await fetch('/api/orders');
+        const json = await res.json();
+        const orders = json.orders || [];
 
         // Group by customer
         const map = {};

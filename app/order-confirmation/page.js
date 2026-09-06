@@ -7,14 +7,14 @@ import Footer from '@/components/storefront/Footer';
 import styles from './confirmation.module.css';
 
 function ConfirmationContent() {
-  const params      = useSearchParams();
+  const params = useSearchParams();
   const orderNumber = params.get('order') ?? 'VYN-XXXXXX';
 
   return (
     <div className={styles.card}>
       <div className={styles.checkCircle}>
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
+          <polyline points="20 6 9 17 4 12" />
         </svg>
       </div>
 
@@ -66,7 +66,7 @@ function ConfirmationContent() {
       <div className={styles.waBox}>
         <p className="body-sm">Questions about your order?</p>
         <a
-          href="https://wa.me/923000000000"
+          href="https://wa.me/923363791538"
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn-ghost"

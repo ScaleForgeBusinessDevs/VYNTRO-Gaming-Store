@@ -33,11 +33,11 @@ export default function AdminDashboard() {
           dateFilter = d.toISOString();
         }
 
-        // Orders query
-        let ordersQ = supabase.from('orders').select('total_amount, total_cogs, profit_margin, status, customer_id, created_at');
-        if (dateFilter) ordersQ = ordersQ.gte('created_at', dateFilter);
-        const { data: ordersData } = await ordersQ;
-        const orders = ordersData || [];
+        // Orders query via service API
+        const ordersUrl = dateFilter ? `/api/orders?dateFrom=${encodeURIComponent(dateFilter)}` : '/api/orders';
+        const ordersRes = await fetch(ordersUrl);
+        const ordersJson = await ordersRes.json();
+        const orders = ordersJson.orders || [];
 
         // Compute stats
         const totalRevenue  = orders.reduce((s, o) => s + (o.total_amount ?? 0), 0);
@@ -46,7 +46,7 @@ export default function AdminDashboard() {
         const blendedMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
 
         // Unique customers + repeat rate
-        const custIds = orders.map((o) => o.customer_id);
+        const custIds = orders.map((o) => o.customer_id || o.customers?.id).filter(Boolean);
         const unique  = new Set(custIds).size;
         const repeat  = custIds.length > unique
           ? Math.round(((custIds.length - unique) / custIds.length) * 100)
@@ -61,22 +61,17 @@ export default function AdminDashboard() {
           repeatRate: repeat,
         });
 
-        // Low stock
-        const { data: lsData } = await supabase
-          .from('products')
-          .select('id, name, stock_quantity')
-          .lte('stock_quantity', 5)
-          .eq('is_active', true)
-          .order('stock_quantity');
-        setLowStock(lsData || []);
+        // Low stock via products API
+        const prodRes = await fetch('/api/admin/products');
+        const prodJson = await prodRes.json();
+        const allProds = prodJson.products || [];
+        const lsData = allProds
+          .filter((p) => p.is_active && (p.stock_quantity ?? 0) <= 5)
+          .sort((a, b) => (a.stock_quantity ?? 0) - (b.stock_quantity ?? 0));
+        setLowStock(lsData);
 
         // Recent orders
-        const { data: recentData } = await supabase
-          .from('orders')
-          .select('id, order_number, status, total_amount, created_at, customers(name)')
-          .order('created_at', { ascending: false })
-          .limit(5);
-        setRecentOrders(recentData || []);
+        setRecentOrders(orders.slice(0, 5));
       } catch (e) {
         console.error(e);
         setStats({
