@@ -116,17 +116,20 @@ export async function POST(request) {
     const orderItems = await Promise.all(
       items.map(async (item) => {
         // Fetch cost price from products table for accurate COGS
-        const realProductId = item.productId || item.id;
+        const rawId = item.productId || item.id;
+        const isValidUuid = typeof rawId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawId);
         let costPrice = 0;
-        try {
-          const { data: prod } = await supabase
-            .from('products')
-            .select('cost_price')
-            .eq('id', realProductId)
-            .single();
-          if (prod) costPrice = prod.cost_price ?? 0;
-        } catch {
-          // Fallback
+        if (isValidUuid) {
+          try {
+            const { data: prod } = await supabase
+              .from('products')
+              .select('cost_price')
+              .eq('id', rawId)
+              .single();
+            if (prod) costPrice = prod.cost_price ?? 0;
+          } catch {
+            // Fallback
+          }
         }
         realCogs += costPrice * item.quantity;
 
@@ -136,7 +139,7 @@ export async function POST(request) {
 
         return {
           order_id:              order.id,
-          product_id:            realProductId,
+          product_id:            isValidUuid ? rawId : null,
           product_name_snapshot: displayName,
           quantity:              item.quantity,
           unit_price:            item.price,
