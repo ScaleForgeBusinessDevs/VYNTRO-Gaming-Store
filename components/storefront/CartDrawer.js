@@ -122,12 +122,44 @@ function CartItem({ item, onRemove, onQtyChange }) {
 
       {/* Info */}
       <div className={styles.itemInfo}>
+        {/* Bundle badge */}
+        {item.isBundle && (
+          <span style={{
+            display: 'inline-block',
+            fontSize: '0.58rem',
+            fontWeight: 700,
+            letterSpacing: '0.18em',
+            color: '#fff',
+            background: '#E60012',
+            padding: '2px 7px',
+            borderRadius: '2px',
+            marginBottom: '4px',
+            textTransform: 'uppercase',
+          }}>
+            BUNDLE
+          </span>
+        )}
+
         <p className={styles.itemName}>{item.name}</p>
-        {item.variant && (
+
+        {/* Show size variant for regular products */}
+        {!item.isBundle && item.variant && (
           <p className={styles.itemVariant} style={{ fontSize: '0.72rem', color: '#FF334B', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '-2px 0 4px' }}>
             SIZE: {item.variant} {item.variantDims ? `(${item.variantDims})` : ''}
           </p>
         )}
+
+        {/* Show included items for bundles */}
+        {item.isBundle && item.bundleItems?.length > 0 && (
+          <ul style={{ margin: '2px 0 4px', padding: 0, listStyle: 'none' }}>
+            {item.bundleItems.map((name, i) => (
+              <li key={i} style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.02em', lineHeight: 1.6 }}>
+                · {name}
+              </li>
+            ))}
+          </ul>
+        )}
+
         <p className={styles.itemPrice}>PKR {item.price.toLocaleString()}</p>
 
         {/* Qty controls */}

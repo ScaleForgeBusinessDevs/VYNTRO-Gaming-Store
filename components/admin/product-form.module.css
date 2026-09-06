@@ -1,4 +1,4 @@
-.page { display: flex; flex-direction: column; gap: 24px; max-width: 1000px; }
+.page { display: flex; flex-direction: column; gap: 24px; width: 100%; max-width: 100%; }
 .loading { display: flex; align-items: center; justify-content: center; min-height: 300px; }
 
 .header {
@@ -56,16 +56,17 @@
   transform: translateX(20px);
 }
 
-.form { display: flex; flex-direction: column; gap: 20px; }
+.form { display: flex; flex-direction: column; gap: 20px; width: 100%; }
 
 .grid {
   display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 20px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(400px, 1fr);
+  gap: 24px;
   align-items: start;
+  width: 100%;
 }
 
-@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+@media (max-width: 1060px) { .grid { grid-template-columns: 1fr; } }
 
 .col { display: flex; flex-direction: column; gap: 16px; }
 
@@ -97,6 +98,47 @@
   background: var(--bg-elevated);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
+}
+
+/* Image size guideline tip */
+.imageSpecTip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(230, 0, 18, 0.06);
+  border: 1px solid rgba(230, 0, 18, 0.22);
+  border-radius: var(--radius-md);
+  margin-bottom: 14px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.imageSpecTipIcon {
+  color: #E60012;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.imageSpecTipTitle {
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+
+.imageSpecList {
+  margin: 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.imageSpecList strong {
+  color: #FFFFFF;
 }
 
 /* Upload area */
@@ -453,4 +495,246 @@
   width: 100%;
 }
 
+/* ── Color Variants Editor ── */
+.colorVariantsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.colorVariantCard {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.colorVariantHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.colorPreviewDot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.colorVariantIndex {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.04em;
+}
+
+.removeColorBtn {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(230, 0, 18, 0.1);
+  border: 1px solid rgba(230, 0, 18, 0.25);
+  border-radius: 4px;
+  color: #ff334b;
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.2s;
+}
+.removeColorBtn:hover {
+  background: rgba(230, 0, 18, 0.25);
+}
+
+.colorVariantFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 14px;
+}
+
+@media (max-width: 600px) {
+  .colorVariantFields { grid-template-columns: 1fr; }
+}
+
+.hexRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.colorPicker {
+  width: 40px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+/* Variant Image Upload & Thumbnail Grid */
+.variantImageGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.variantImgThumb {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #111;
+  transition: border-color 0.2s;
+}
+
+.variantImgPrimary {
+  border-color: #E60012;
+  box-shadow: 0 0 8px rgba(230, 0, 18, 0.3);
+}
+
+.variantImgActions {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.variantImgThumb:hover .variantImgActions {
+  opacity: 1;
+}
+
+.setSwatchBtn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: background 0.15s;
+}
+.setSwatchBtn:hover {
+  background: #E60012;
+}
+
+.removeImgBtn {
+  align-self: flex-end;
+  background: rgba(230, 0, 18, 0.85);
+  border: none;
+  color: #fff;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.variantUploadRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.variantUploadBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  width: fit-content;
+}
+
+.variantUploadBtn:hover {
+  background: rgba(230, 0, 18, 0.1);
+  border-color: #E60012;
+  color: #fff;
+}
+
+.attachExistingWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.miniPhotoPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.miniPhotoThumb {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.miniPhotoThumb:hover {
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.miniPhotoAttached {
+  border: 2px solid #E60012 !important;
+}
+
+.miniCheck {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  background: #E60012;
+  color: #fff;
+  font-size: 0.55rem;
+  font-weight: 900;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
 

@@ -7,6 +7,7 @@ import styles from './Navbar.module.css';
 
 const NAV_LINKS = [
   { label: 'HOME', href: '/' },
+  { label: 'COLLECTION', href: '/bundles' },
   { label: 'MOUSEPADS', href: '/mousepads' },
   { label: 'MICE', href: '/mice' },
   { label: 'KEYBOARDS', href: '/keyboards' },

@@ -4,9 +4,15 @@ import Image from 'next/image';
 import { gsap } from 'gsap';
 import styles from './Hero.module.css';
 
+function scrollToCategories() {
+  const el = document.getElementById('category-grid');
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
 export default function Hero() {
   const heroRef = useRef(null);
   const visualRef = useRef(null);
+  const overlayRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -15,6 +21,14 @@ export default function Hero() {
           visualRef.current,
           { scale: 0.98, opacity: 0 },
           { scale: 1, opacity: 1, duration: 1, ease: 'power3.out' }
+        );
+      }
+      if (overlayRef.current) {
+        const children = overlayRef.current.children;
+        gsap.fromTo(
+          children,
+          { y: 18, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.9, stagger: 0.15, ease: 'power3.out', delay: 0.4 }
         );
       }
     }, heroRef);
@@ -38,10 +52,19 @@ export default function Hero() {
           />
         </div>
 
-        {/* Semantic Content for SEO / Accessibility */}
-        <div className={styles.srOnly}>
-          <h1>VYNTRO — YOUR SETUP. YOUR ADVANTAGE.</h1>
-          <p>CUSTOM MOUSEPADS, PREMIUM GEAR.</p>
+        {/* Hero Text Overlay */}
+        <div className={styles.heroOverlay} ref={overlayRef}>
+          <h1 className={styles.heroTagline}>
+            YOUR SETUP. <span className={styles.heroAccent}>YOUR ADVANTAGE.</span>
+          </h1>
+          <p className={styles.heroSubtitle}>CUSTOM MOUSEPADS. PREMIUM GEAR.</p>
+          <button
+            className={styles.shopNowBtn}
+            onClick={scrollToCategories}
+            id="hero-shop-now"
+          >
+            SHOP NOW
+          </button>
         </div>
       </div>
     </section>

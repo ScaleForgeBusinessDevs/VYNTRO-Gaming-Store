@@ -34,19 +34,41 @@ export async function POST(request) {
       .select()
       .single();
 
-    // If 'collections' or 'size_pricing' column doesn't exist yet in Supabase schema cache, retry without them
-    if (error && error.message && (error.message.toLowerCase().includes('collections') || error.message.toLowerCase().includes('size_pricing'))) {
-      const safePayload = { ...payload };
-      if (error.message.toLowerCase().includes('collections')) delete safePayload.collections;
-      if (error.message.toLowerCase().includes('size_pricing')) delete safePayload.size_pricing;
+    // If any column (like color_variants, size_pricing, collections) doesn't exist yet in Supabase schema cache, retry without it
+    let attempts = 0;
+    const safePayload = { ...payload };
+    while (error && error.message && attempts < 5) {
+      const match = error.message.match(/Could not find the '([^']+)' column/i);
+      if (match && match[1]) {
+        delete safePayload[match[1]];
+        const retry = await supabase
+          .from('products')
+          .insert(safePayload)
+          .select()
+          .single();
+        data = retry.data;
+        error = retry.error;
+        attempts++;
+      } else if (
+        error.message.toLowerCase().includes('collections') ||
+        error.message.toLowerCase().includes('size_pricing') ||
+        error.message.toLowerCase().includes('color_variants')
+      ) {
+        if (error.message.toLowerCase().includes('collections')) delete safePayload.collections;
+        if (error.message.toLowerCase().includes('size_pricing')) delete safePayload.size_pricing;
+        if (error.message.toLowerCase().includes('color_variants')) delete safePayload.color_variants;
 
-      const retry = await supabase
-        .from('products')
-        .insert(safePayload)
-        .select()
-        .single();
-      data = retry.data;
-      error = retry.error;
+        const retry = await supabase
+          .from('products')
+          .insert(safePayload)
+          .select()
+          .single();
+        data = retry.data;
+        error = retry.error;
+        attempts++;
+      } else {
+        break;
+      }
     }
 
     if (error) throw error;

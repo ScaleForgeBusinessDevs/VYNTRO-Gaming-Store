@@ -1,0 +1,184 @@
+/* ─── Bundles Listing Page ───────────────────────────────────────────────── */
+
+.main {
+  padding-top: 100px;
+  min-height: 100vh;
+  background-color: var(--bg-primary, #0A0A0C);
+}
+
+/* ── Header ── */
+.header {
+  text-align: center;
+  padding: 48px 0 56px;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.eyebrowLine {
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--accent, #E60012);
+}
+
+.eyebrowText {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--accent, #E60012);
+  text-transform: uppercase;
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #fff;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  line-height: 1.1;
+}
+
+.titleAccent {
+  color: var(--accent, #E60012);
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.45);
+  max-width: 440px;
+  margin: 0 auto;
+  letter-spacing: 0.04em;
+}
+
+/* ── Grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  padding-bottom: 80px;
+}
+
+/* ── Card ── */
+.card {
+  position: relative;
+  display: block;
+  height: 440px;
+  border-radius: 4px;
+  overflow: hidden;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.card:hover .bgImg {
+  transform: scale(1.06);
+}
+
+.card:hover .viewDeal {
+  letter-spacing: 0.22em;
+  color: var(--accent, #E60012);
+}
+
+.imgWrapper {
+  position: absolute;
+  inset: 0;
+}
+
+.bgImg {
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.88) 0%,
+    rgba(0, 0, 0, 0.5) 45%,
+    rgba(0, 0, 0, 0.15) 100%
+  );
+}
+
+.cardContent {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 28px 24px;
+  gap: 6px;
+}
+
+.bundleBadge {
+  display: inline-block;
+  width: fit-content;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: #fff;
+  background: var(--accent, #E60012);
+  padding: 3px 10px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.bundleName {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fff;
+  margin: 0;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.bundleTagline {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.bundlePrice {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+
+.viewDeal {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+  transition: letter-spacing 0.3s ease, color 0.3s ease;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    height: 360px;
+  }
+}

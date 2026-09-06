@@ -3,7 +3,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { MOUSEPAD_SIZES } from '@/lib/sizeVariants';
+import { emptyColorVariant } from '@/lib/colorVariants';
 import styles from './product-form.module.css';
+
 
 const PRODUCT_TYPES = [
   { id: 'Mice', label: 'Gaming Mice', icon: '🖱️', defaultCat: 'Mice' },
@@ -60,12 +62,118 @@ export default function ProductFormPage({ isEdit = false }) {
     XXXL: '',
   });
 
+  // Color variants state
+  const [colorVariants, setColorVariants] = useState([]);
+
+  function addColorVariant() {
+    setColorVariants((prev) => [...prev, emptyColorVariant()]);
+  }
+
+  function removeColorVariant(idx) {
+    setColorVariants((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  function updateColorVariant(idx, field, value) {
+    setColorVariants((prev) =>
+      prev.map((cv, i) => {
+        if (i !== idx) return cv;
+        const updated = { ...cv, [field]: value };
+        if (field === 'name') {
+          updated.id = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        }
+        return updated;
+      })
+    );
+  }
+
+  const [uploadingVariantIdx, setUploadingVariantIdx] = useState(null);
+
+  async function handleVariantFileUpload(variantIdx, e) {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    setUploadingVariantIdx(variantIdx);
+    try {
+      const formData = new FormData();
+      formData.append('slug', form.slug.trim() || 'variant');
+      files.forEach((file) => formData.append('files', file));
+
+      const uploadRes = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const uploadData = await uploadRes.json();
+      if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload failed');
+
+      const newUrls = uploadData.urls || [];
+      setColorVariants((prev) => {
+        const next = [...prev];
+        const curImages = next[variantIdx].images || [];
+        const combined = [...curImages, ...newUrls];
+        next[variantIdx] = {
+          ...next[variantIdx],
+          images: combined,
+          image: next[variantIdx].image || newUrls[0] || '',
+        };
+        return next;
+      });
+    } catch (err) {
+      alert('Error uploading variant image: ' + err.message);
+    } finally {
+      setUploadingVariantIdx(null);
+      e.target.value = '';
+    }
+  }
+
+  function removeVariantImage(variantIdx, imgIdx) {
+    setColorVariants((prev) => {
+      const next = [...prev];
+      const curImages = (next[variantIdx].images || []).filter((_, i) => i !== imgIdx);
+      let curThumb = next[variantIdx].image;
+      if (!curImages.includes(curThumb)) {
+        curThumb = curImages[0] || '';
+      }
+      next[variantIdx] = {
+        ...next[variantIdx],
+        images: curImages,
+        image: curThumb,
+      };
+      return next;
+    });
+  }
+
+  function setVariantSwatchImage(variantIdx, imgUrl) {
+    setColorVariants((prev) => {
+      const next = [...prev];
+      next[variantIdx] = {
+        ...next[variantIdx],
+        image: imgUrl,
+      };
+      return next;
+    });
+  }
+
+  function addExistingImageToVariant(variantIdx, imgUrl) {
+    setColorVariants((prev) => {
+      const next = [...prev];
+      const curImages = next[variantIdx].images || [];
+      if (!curImages.includes(imgUrl)) {
+        next[variantIdx] = {
+          ...next[variantIdx],
+          images: [...curImages, imgUrl],
+          image: next[variantIdx].image || imgUrl,
+        };
+      }
+      return next;
+    });
+  }
+
   function handleSizePriceChange(sizeId, value) {
     setSizePricing((prev) => ({
       ...prev,
       [sizeId]: value,
     }));
   }
+
 
   function autoCalculateSizePrices() {
     const base = Number(form.selling_price) || 2999;
@@ -155,9 +263,27 @@ export default function ProductFormPage({ isEdit = false }) {
             delivery_time: data.delivery_time ?? '3–5 business days',
             warranty_period: data.warranty_period ?? '6 months',
             care_instructions: data.care_instructions ?? 'Wipe clean with a damp microfiber cloth',
-            material_specs: data.material_specs ?? '',
+            material_specs: (data.material_specs ?? '')
+              .replace(/__SIZES__.*?__SIZES__/g, '')
+              .replace(/__COLORS__.*?__COLORS__/g, '')
+              .trim(),
           });
           setImages(data.images ?? []);
+
+          // Parse color variants
+          let loadedColors = data.color_variants;
+          if (typeof loadedColors === 'string') {
+            try { loadedColors = JSON.parse(loadedColors); } catch { loadedColors = []; }
+          }
+          if ((!loadedColors || loadedColors.length === 0) && data.material_specs && data.material_specs.includes('__COLORS__')) {
+            try {
+              const match = data.material_specs.match(/__COLORS__(.*?)__COLORS__/);
+              if (match && match[1]) loadedColors = JSON.parse(match[1]);
+            } catch {}
+          }
+          if (Array.isArray(loadedColors) && loadedColors.length > 0) {
+            setColorVariants(loadedColors);
+          }
 
           // Parse size pricing if available
           let loadedSizePricing = data.size_pricing;
@@ -397,6 +523,12 @@ export default function ProductFormPage({ isEdit = false }) {
         finalMaterialSpecs = `${finalMaterialSpecs} __SIZES__${JSON.stringify(cleanSizePricing)}__SIZES__`.trim();
       }
 
+      if (colorVariants.length > 0) {
+        // Strip any existing __COLORS__ block
+        finalMaterialSpecs = finalMaterialSpecs.replace(/__COLORS__.*?__COLORS__/g, '').trim();
+        finalMaterialSpecs = `${finalMaterialSpecs} __COLORS__${JSON.stringify(colorVariants)}__COLORS__`.trim();
+      }
+
       const payload = {
         name: form.name.trim(),
         slug: form.slug.trim(),
@@ -414,6 +546,7 @@ export default function ProductFormPage({ isEdit = false }) {
         material_specs: finalMaterialSpecs,
         images: allImages,
         size_pricing: Object.keys(cleanSizePricing).length > 0 ? cleanSizePricing : null,
+        color_variants: colorVariants.length > 0 ? colorVariants : null,
       };
 
       const url = isEdit && productId ? `/api/admin/products/${productId}` : '/api/admin/products';
@@ -1180,6 +1313,23 @@ export default function ProductFormPage({ isEdit = false }) {
             <div className={`glass-light ${styles.section}`}>
               <h2 className={styles.sectionTitle}>Product Images</h2>
 
+              {/* Recommended Dimensions Guide */}
+              <div className={styles.imageSpecTip}>
+                <svg className={styles.imageSpecTipIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+                <div>
+                  <div className={styles.imageSpecTipTitle}>Recommended Image Sizes for Perfect Fit</div>
+                  <ul className={styles.imageSpecList}>
+                    <li><strong>Mice, Keyboards, Audio:</strong> 1:1 Square — <strong>1000 × 1000 px</strong> or <strong>1200 × 1200 px</strong> (centered subject with clean background)</li>
+                    <li><strong>Mousepads & Deskmats:</strong> 16:9 Landscape — <strong>1920 × 1080 px</strong> or 1:1 square (<strong>1200 × 1200 px</strong>)</li>
+                    <li><strong>File Formats:</strong> PNG, JPG, or WebP (crisp resolution, max 10MB)</li>
+                  </ul>
+                </div>
+              </div>
+
               {/* Upload area */}
               <label className={styles.uploadArea} htmlFor="product-images">
                 <input
@@ -1233,6 +1383,204 @@ export default function ProductFormPage({ isEdit = false }) {
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* ── Color Variants Editor ── */}
+            <div className={`glass-light ${styles.section}`}>
+              <div className={styles.specSectionHeader}>
+                <div>
+                  <h2 className={styles.sectionTitle}>Color Variants</h2>
+                  <p className="body-xs muted" style={{ margin: '2px 0 0' }}>
+                    Add color options — each variant can have its own gallery and price adjustment.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className={styles.autoCalcBtn}
+                  onClick={addColorVariant}
+                  id="add-color-variant-btn"
+                >
+                  + Add Color
+                </button>
+              </div>
+
+              {colorVariants.length === 0 && (
+                <p className="body-sm muted" style={{ textAlign: 'center', padding: '20px 0', opacity: 0.45 }}>
+                  No color variants yet. Click "+ Add Color" to begin.
+                </p>
+              )}
+
+              <div className={styles.colorVariantsList}>
+                {colorVariants.map((cv, idx) => (
+                  <div key={idx} className={styles.colorVariantCard}>
+                    <div className={styles.colorVariantHeader}>
+                      <span
+                        className={styles.colorPreviewDot}
+                        style={{ background: cv.hex || '#333' }}
+                      />
+                      <span className={styles.colorVariantIndex}>
+                        {cv.name || `Variant ${idx + 1}`}
+                      </span>
+                      <button
+                        type="button"
+                        className={styles.removeColorBtn}
+                        onClick={() => removeColorVariant(idx)}
+                        aria-label="Remove variant"
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    <div className={styles.colorVariantFields}>
+                      <div className="form-group">
+                        <label className="form-label">Color Name *</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          placeholder="e.g. Cloud Black"
+                          value={cv.name}
+                          onChange={(e) => updateColorVariant(idx, 'name', e.target.value)}
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Hex Color</label>
+                        <div className={styles.hexRow}>
+                          <input
+                            type="color"
+                            className={styles.colorPicker}
+                            value={cv.hex || '#1a1a1a'}
+                            onChange={(e) => updateColorVariant(idx, 'hex', e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="form-input"
+                            placeholder="#1a1a1a"
+                            value={cv.hex || ''}
+                            onChange={(e) => updateColorVariant(idx, 'hex', e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="form-group">
+                        <label className="form-label">Price Adjustment (PKR)</label>
+                        <input
+                          type="number"
+                          className="form-input"
+                          placeholder="0"
+                          step="50"
+                          value={cv.priceDiff ?? 0}
+                          onChange={(e) => updateColorVariant(idx, 'priceDiff', Number(e.target.value))}
+                        />
+                        <span className="body-xs muted" style={{ marginTop: 3, display: 'block' }}>
+                          Positive = premium surcharge. Negative = discounted color. 0 = same price.
+                        </span>
+                      </div>
+
+                      {/* Variant Images Section */}
+                      <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, flexWrap: 'wrap', gap: '4px' }}>
+                          <label className="form-label" style={{ margin: 0 }}>Variant Photos</label>
+                          <span className="body-xs" style={{ color: 'rgba(255, 255, 255, 0.45)', fontSize: '0.72rem' }}>
+                            Best fit: <strong>1000 × 1000 px</strong> (1:1 square) • Click photo to set swatch
+                          </span>
+                        </div>
+
+                        {/* Uploaded Variant Images Gallery */}
+                        {(cv.images || []).length > 0 && (
+                          <div className={styles.variantImageGrid}>
+                            {(cv.images || []).map((imgUrl, imgIdx) => (
+                              <div
+                                key={imgIdx}
+                                className={`${styles.variantImgThumb} ${cv.image === imgUrl ? styles.variantImgPrimary : ''}`}
+                              >
+                                <Image
+                                  src={imgUrl}
+                                  alt={`${cv.name} ${imgIdx + 1}`}
+                                  fill
+                                  style={{ objectFit: 'cover' }}
+                                  sizes="72px"
+                                />
+                                <div className={styles.variantImgActions}>
+                                  <button
+                                    type="button"
+                                    className={styles.removeImgBtn}
+                                    onClick={() => removeVariantImage(idx, imgIdx)}
+                                    title="Remove this photo"
+                                  >
+                                    ×
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className={styles.setSwatchBtn}
+                                    onClick={() => setVariantSwatchImage(idx, imgUrl)}
+                                    title="Use this photo as swatch thumbnail"
+                                  >
+                                    {cv.image === imgUrl ? '★ Swatch' : 'Set Swatch'}
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Upload Button */}
+                        <div className={styles.variantUploadRow}>
+                          <label className={styles.variantUploadBtn} htmlFor={`variant-file-${idx}`}>
+                            <input
+                              id={`variant-file-${idx}`}
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              style={{ display: 'none' }}
+                              onChange={(e) => handleVariantFileUpload(idx, e)}
+                              disabled={uploadingVariantIdx === idx}
+                            />
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                              <polyline points="17 8 12 3 7 8" />
+                              <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            <span>
+                              {uploadingVariantIdx === idx ? 'Uploading photo...' : '+ Upload Photo(s) for this Variant'}
+                            </span>
+                          </label>
+
+                          {/* Quick-attach from main product images if available */}
+                          {images.length > 0 && (
+                            <div className={styles.attachExistingWrap}>
+                              <span className="body-xs muted">Or click a photo from main product images to attach:</span>
+                              <div className={styles.miniPhotoPicker}>
+                                {images.map((imgUrl, pIdx) => {
+                                  const isAttached = (cv.images || []).includes(imgUrl);
+                                  return (
+                                    <button
+                                      key={pIdx}
+                                      type="button"
+                                      className={`${styles.miniPhotoThumb} ${isAttached ? styles.miniPhotoAttached : ''}`}
+                                      onClick={() => {
+                                        if (isAttached) {
+                                          removeVariantImage(idx, (cv.images || []).indexOf(imgUrl));
+                                        } else {
+                                          addExistingImageToVariant(idx, imgUrl);
+                                        }
+                                      }}
+                                      title={isAttached ? 'Click to detach' : 'Click to attach to this variant'}
+                                    >
+                                      <Image src={imgUrl} alt={`Product ${pIdx + 1}`} fill style={{ objectFit: 'cover' }} sizes="38px" />
+                                      {isAttached && <span className={styles.miniCheck}>✓</span>}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Submit / Action Panel */}

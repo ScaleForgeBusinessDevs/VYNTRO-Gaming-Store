@@ -1,4 +1,4 @@
-.page { display: flex; flex-direction: column; gap: 20px; max-width: 1000px; }
+.page { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 100%; }
 .header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .search { max-width: 360px; }
 .loading { display: flex; align-items: center; justify-content: center; min-height: 300px; }

@@ -2,12 +2,15 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import Navbar from '@/components/storefront/Navbar';
 import Footer from '@/components/storefront/Footer';
 import useCartStore from '@/lib/cartStore';
 import { isMousepadProduct, getProductSizeVariants } from '@/lib/sizeVariants';
+import { getColorVariants } from '@/lib/colorVariants';
 import styles from './product.module.css';
 
+/* ── Placeholder fallback ─────────────────────────────────────── */
 const PLACEHOLDER = {
   id: '1',
   name: 'Midnight Black XL',
@@ -17,20 +20,122 @@ const PLACEHOLDER = {
   stock_quantity: 12,
   images: [],
   category: 'XXL Deskmats',
-  description: 'The Midnight Black XL is our flagship deskmat — an expansive surface that gives you the control and precision your setup deserves. Whether you\'re gaming, coding, or just building the perfect aesthetic, this mat delivers.',
+  description: 'The Midnight Black XL is our flagship deskmat — an expansive surface that gives you the control and precision your setup deserves.',
   delivery_time: '3–5 business days',
   warranty_period: '6 months',
   care_instructions: 'Wipe clean with a damp cloth. Do not machine wash.',
   material_specs: '900×400mm, 4mm thickness, stitched edge, non-slip rubber base',
 };
 
-const INFO_BLOCKS = [
-  { key: 'delivery_time', label: 'Delivery Time', icon: <DeliveryIcon /> },
-  { key: 'warranty_period', label: 'Warranty', icon: <ShieldIcon /> },
-  { key: 'care_instructions', label: 'Care', icon: <InfoIcon /> },
-  { key: 'material_specs', label: 'Specs', icon: <SpecsIcon /> },
-];
+/* ── Accordion component ──────────────────────────────────────── */
+function Accordion({ title, children, defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className={styles.accordion}>
+      <button
+        className={styles.accordionTrigger}
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        type="button"
+      >
+        <span className={styles.accordionTitle}>{title}</span>
+        <span className={`${styles.accordionChevron} ${open ? styles.accordionChevronOpen : ''}`}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </span>
+      </button>
+      {open && <div className={styles.accordionBody}>{children}</div>}
+    </div>
+  );
+}
 
+/* ── Image normaliser (same as shop) ─────────────────────────── */
+function cleanImgSrc(src) {
+  if (!src) return null;
+  if (src.includes('Sakura Landscape')) return '/sakura-mousepad.jpg';
+  if (src.includes('Wave MTG')) return '/dragon-wave-mousepad.jpg';
+  if (src.includes('Zindoo XXL')) return '/tactical-mousepad.jpg';
+  if (src.toLowerCase().includes('hero_upscaled')) return '/hero-upscaled.jpeg';
+  return src;
+}
+
+function ProductBreadcrumb({ productName }) {
+  return (
+    <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+      <Link href="/" className={styles.breadcrumbLink}>Home</Link>
+      <span className={styles.sep}>›</span>
+      <Link href="/shop" className={styles.breadcrumbLink}>Shop</Link>
+      <span className={styles.sep}>›</span>
+      <span className={styles.breadcrumbCurrent}>{productName}</span>
+    </nav>
+  );
+}
+
+function GallerySection({ currentImg, galleryImages, gallery, setGallery, productName }) {
+  return (
+    <>
+      <div className={styles.mainImgWrap}>
+        {currentImg ? (
+          <Image
+            src={currentImg}
+            alt={productName}
+            fill
+            priority
+            sizes="(max-width: 900px) 100vw, 55vw"
+            className={styles.mainImg}
+          />
+        ) : (
+          <div className={styles.imgPlaceholder}>
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.8" style={{ opacity: 0.12 }}>
+              <rect x="1" y="5" width="22" height="14" rx="2" />
+            </svg>
+            <span>No image</span>
+          </div>
+        )}
+
+        {galleryImages.length > 1 && (
+          <>
+            <button
+              className={`${styles.arrowBtn} ${styles.arrowLeft}`}
+              onClick={() => setGallery((g) => (g - 1 + galleryImages.length) % galleryImages.length)}
+              aria-label="Previous image"
+              type="button"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="15 18 9 12 15 6" /></svg>
+            </button>
+            <button
+              className={`${styles.arrowBtn} ${styles.arrowRight}`}
+              onClick={() => setGallery((g) => (g + 1) % galleryImages.length)}
+              aria-label="Next image"
+              type="button"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="9 18 15 12 9 6" /></svg>
+            </button>
+          </>
+        )}
+      </div>
+
+      {galleryImages.length > 1 && (
+        <div className={styles.thumbStrip}>
+          {galleryImages.map((src, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`${styles.thumb} ${gallery === i ? styles.thumbActive : ''}`}
+              onClick={() => setGallery(i)}
+              aria-label={`Image ${i + 1}`}
+            >
+              <Image src={src} alt="" fill sizes="80px" style={{ objectFit: 'cover' }} />
+            </button>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ── Main component ───────────────────────────────────────────── */
 export default function ProductPage() {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
@@ -38,28 +143,25 @@ export default function ProductPage() {
   const [gallery, setGallery] = useState(0);
   const [added, setAdded] = useState(false);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
 
   const addItem = useCartStore((s) => s.addItem);
 
+  /* Load product */
   useEffect(() => {
     const load = async () => {
       try {
         const { getSupabase } = await import('@/lib/supabase');
         const supabase = getSupabase();
-        const { data } = await supabase
-          .from('products')
-          .select('*')
-          .eq('slug', slug)
-          .single();
-        const loadedProduct = data ?? PLACEHOLDER;
-        setProduct(loadedProduct);
-
-        // Auto-select XXL or first size if mousepad
-        if (isMousepadProduct(loadedProduct)) {
-          const sizes = getProductSizeVariants(loadedProduct);
-          const defaultSize = sizes.find((s) => s.id === 'XXL') || sizes[0];
-          setSelectedSize(defaultSize || null);
+        const { data } = await supabase.from('products').select('*').eq('slug', slug).single();
+        const loaded = data ?? PLACEHOLDER;
+        setProduct(loaded);
+        if (isMousepadProduct(loaded)) {
+          const sizes = getProductSizeVariants(loaded);
+          setSelectedSize(sizes.find((s) => s.id === 'XXL') || sizes[0] || null);
         }
+        const colors = getColorVariants(loaded);
+        if (colors.length > 0) setSelectedColor(colors[0]);
       } catch {
         setProduct(PLACEHOLDER);
         const sizes = getProductSizeVariants(PLACEHOLDER);
@@ -71,29 +173,46 @@ export default function ProductPage() {
 
   const isMousepad = useMemo(() => isMousepadProduct(product), [product]);
   const sizeVariants = useMemo(() => getProductSizeVariants(product), [product]);
+  const colorVariants = useMemo(() => getColorVariants(product), [product]);
 
+  /* Gallery images — prefer selected color's images if available */
+  const galleryImages = useMemo(() => {
+    let colorImgs = null;
+    if (selectedColor?.images && selectedColor.images.length > 0) {
+      colorImgs = selectedColor.images;
+    } else if (selectedColor?.image) {
+      colorImgs = [selectedColor.image];
+    }
+    const base = (colorImgs && colorImgs.length > 0) ? colorImgs : (product?.images || []);
+    return base.map(cleanImgSrc).filter(Boolean);
+  }, [product, selectedColor]);
+
+  /* Reset gallery index when images or color change */
+  useEffect(() => { setGallery(0); }, [selectedColor, galleryImages.length]);
+
+  /* Loading state */
   if (!product) {
     return (
       <>
         <Navbar />
-        <div className={styles.loading}>
-          <div className="spinner" />
-        </div>
+        <div className={styles.loading}><div className="spinner" /></div>
       </>
     );
   }
 
-  // Active pricing considering selected size
+  /* Pricing */
   const activeBasePrice = selectedSize ? selectedSize.price : product.selling_price;
+  const colorPriceDiff = selectedColor?.priceDiff ?? 0;
+  const priceWithColor = activeBasePrice + colorPriceDiff;
   const discountedPrice = product.discount_percentage
-    ? Math.round(activeBasePrice * (1 - product.discount_percentage / 100))
+    ? Math.round(priceWithColor * (1 - product.discount_percentage / 100))
     : null;
-  const displayPrice = selectedSize ? selectedSize.effectivePrice : (discountedPrice ?? activeBasePrice);
+  const displayPrice = discountedPrice ?? priceWithColor;
 
   function handleAddToCart() {
     addItem(product, qty, selectedSize);
     setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    setTimeout(() => setAdded(false), 2200);
   }
 
   function getStockStatus() {
@@ -101,234 +220,248 @@ export default function ProductPage() {
     if (product.stock_quantity <= 5) return { cls: 'low-stock', label: `Only ${product.stock_quantity} left` };
     return { cls: 'in-stock', label: 'In Stock' };
   }
-
   const stock = getStockStatus();
 
-  // Clean specs string for display
+  const hasGallery = galleryImages.length > 0;
+  const currentImg = hasGallery ? galleryImages[gallery] : null;
+
   function getCleanSpecValue(key, val) {
     if (!val) return '';
-    let cleaned = val.replace(/__SIZES__.*?__SIZES__/g, '').trim();
-    if (key === 'material_specs' && selectedSize && selectedSize.dims) {
-      if (/\d+×\d+mm/i.test(cleaned)) {
-        cleaned = cleaned.replace(/\d+×\d+mm/i, selectedSize.dims);
-      } else {
-        cleaned = `${selectedSize.dims}, ${cleaned}`;
-      }
-    }
-    return cleaned;
+    return val
+      .replace(/__SIZES__.*?__SIZES__/g, '')
+      .replace(/__COLORS__.*?__COLORS__/g, '')
+      .trim();
   }
 
-  const waMessage = `Hi VYNTRO! I want to order "${product.name}"${selectedSize ? ` in Size: ${selectedSize.label} (${selectedSize.dims})` : ''} for PKR ${(displayPrice * qty).toLocaleString()} (Qty: ${qty})`;
+  const waMessage = `Hi VYNTRO! I want to order "${product.name}"${selectedColor ? ` in ${selectedColor.name}` : ''}${selectedSize ? ` (Size: ${selectedSize.label} – ${selectedSize.dims})` : ''} for PKR ${(displayPrice * qty).toLocaleString()} (Qty: ${qty})`;
 
   return (
     <>
       <Navbar />
       <main className={styles.main}>
-        <div className="container">
-          {/* Breadcrumb */}
-          <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-            <a href="/" className={styles.breadcrumbLink}>Home</a>
-            <span className={styles.breadcrumbSep}>›</span>
-            <a href="/shop" className={styles.breadcrumbLink}>Shop</a>
-            <span className={styles.breadcrumbSep}>›</span>
-            <span className={styles.breadcrumbCurrent}>{product.name}</span>
-          </nav>
+        <div className={styles.pageGrid}>
+          {/* ══════════════════════════════════════════════════
+              LEFT — Sticky Image Gallery (Desktop)
+          ═══════════════════════════════════════════════════ */}
+          <div className={styles.galleryCol}>
+            <ProductBreadcrumb productName={product.name} />
+            <GallerySection
+              currentImg={currentImg}
+              galleryImages={galleryImages}
+              gallery={gallery}
+              setGallery={setGallery}
+              productName={product.name}
+            />
+          </div>
 
-          <div className={styles.grid}>
-            {/* Image gallery */}
-            <div className={styles.gallery}>
-              {/* Main image */}
-              <div className={styles.mainImg}>
-                {product.images?.[gallery] ? (
-                  <Image
-                    src={
-                      product.images[gallery].includes('Sakura Landscape')
-                        ? '/sakura-mousepad.jpg'
-                        : product.images[gallery].includes('Wave MTG')
-                        ? '/dragon-wave-mousepad.jpg'
-                        : product.images[gallery].includes('Zindoo XXL')
-                        ? '/tactical-mousepad.jpg'
-                        : product.images[gallery].toLowerCase().includes('hero_upscaled')
-                        ? '/hero-upscaled.jpeg'
-                        : product.images[gallery]
-                    }
-                    alt={product.name}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    priority
-                  />
-                ) : (
-                  <div className="placeholder-img">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.8" style={{ opacity: 0.15 }}>
-                      <rect x="1" y="5" width="22" height="14" rx="2"/>
-                    </svg>
-                    <span>Product Image</span>
-                    <span style={{ fontSize: '0.65rem' }}>Place your renders here</span>
-                  </div>
-                )}
-              </div>
+          {/* ══════════════════════════════════════════════════
+              RIGHT — Product Info Panel
+          ═══════════════════════════════════════════════════ */}
+          <div className={styles.infoCol}>
+            {/* Mobile Breadcrumb (hidden on desktop) */}
+            <div className={styles.mobileBreadcrumb}>
+              <ProductBreadcrumb productName={product.name} />
+            </div>
 
-              {/* Thumbnails */}
-              {product.images?.length > 1 && (
-                <div className={styles.thumbs}>
-                  {product.images.map((img, i) => {
-                    const cleanSrc = img.includes('Sakura Landscape')
-                      ? '/sakura-mousepad.jpg'
-                      : img.includes('Wave MTG')
-                      ? '/dragon-wave-mousepad.jpg'
-                      : img.includes('Zindoo XXL')
-                      ? '/tactical-mousepad.jpg'
-                      : img.toLowerCase().includes('hero_upscaled')
-                      ? '/hero-upscaled.jpeg'
-                      : img;
+            {/* Category + Stock */}
+            <div className={styles.topRow}>
+              <span className={styles.categoryBadge}>{product.category}</span>
+              <span className={`stock-badge ${stock.cls}`}>{stock.label}</span>
+            </div>
+
+            {/* Name */}
+            <h1 className={styles.productName}>{product.name}</h1>
+
+            {/* Price */}
+            <div className={styles.priceRow}>
+              <span className={styles.priceMain}>PKR {displayPrice.toLocaleString()}</span>
+              {discountedPrice && (
+                <>
+                  <span className={styles.priceStrike}>PKR {priceWithColor.toLocaleString()}</span>
+                  <span className={styles.priceBadge}>Save {product.discount_percentage}%</span>
+                </>
+              )}
+              {colorPriceDiff !== 0 && (
+                <span className={styles.colorPriceDiff}>
+                  {colorPriceDiff > 0 ? `+PKR ${colorPriceDiff.toLocaleString()}` : `-PKR ${Math.abs(colorPriceDiff).toLocaleString()}`} for this color
+                </span>
+              )}
+            </div>
+
+            <div className={styles.divider} />
+
+            {/* Size selector — only for mousepads */}
+            {isMousepad && sizeVariants.length > 0 && (
+              <div className={styles.selectorSection} id="pdp-size-selector">
+                <div className={styles.selectorHeader}>
+                  <span className={styles.selectorLabel}>SELECT SIZE</span>
+                  <span className={styles.selectorValue}>
+                    {selectedSize ? `${selectedSize.label} — ${selectedSize.dims}` : '—'}
+                  </span>
+                </div>
+                <div className={styles.sizeGrid}>
+                  {sizeVariants.map((sz) => {
+                    const isActive = selectedSize?.id === sz.id;
                     return (
                       <button
-                        key={i}
-                        className={`${styles.thumb} ${gallery === i ? styles.thumbActive : ''}`}
-                        onClick={() => setGallery(i)}
-                        aria-label={`Image ${i + 1}`}
+                        key={sz.id}
+                        type="button"
+                        className={`${styles.sizeBtn} ${isActive ? styles.sizeBtnActive : ''}`}
+                        onClick={() => setSelectedSize(sz)}
+                        id={`size-btn-${sz.id.toLowerCase()}`}
                       >
-                        <Image src={cleanSrc} alt="" fill style={{ objectFit: 'cover' }} />
+                        {sz.popular && <span className={styles.popularDot} />}
+                        <span className={styles.sizeBtnLabel}>{sz.label}</span>
+                        <span className={styles.sizeBtnDims}>{sz.dims}</span>
+                        <span className={styles.sizeBtnPrice}>PKR {sz.effectivePrice.toLocaleString()}</span>
                       </button>
                     );
                   })}
                 </div>
-              )}
+              </div>
+            )}
+
+            {/* Color variant selector */}
+            {colorVariants.length > 0 && (
+              <div className={styles.selectorSection} id="pdp-color-selector">
+                <div className={styles.selectorHeader}>
+                  <span className={styles.selectorLabel}>AVAILABLE COLORS</span>
+                  <span className={styles.selectorValue}>
+                    {selectedColor ? selectedColor.name : '—'}
+                  </span>
+                </div>
+                <div className={styles.colorSwatches}>
+                  {colorVariants.map((cv) => {
+                    const isActive = selectedColor?.id === cv.id;
+                    return (
+                      <button
+                        key={cv.id}
+                        type="button"
+                        title={cv.name}
+                        className={`${styles.swatch} ${isActive ? styles.swatchActive : ''}`}
+                        onClick={() => setSelectedColor(cv)}
+                        id={`color-btn-${cv.id}`}
+                      >
+                        {cv.image ? (
+                          <Image src={cv.image} alt={cv.name} fill sizes="48px" style={{ objectFit: 'cover', borderRadius: '50%' }} />
+                        ) : (
+                          <span className={styles.swatchColor} style={{ background: cv.hex || '#333' }} />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Image Gallery — shows immediately after available colors (hidden on desktop) */}
+            <div className={styles.mobileGalleryWrap}>
+              <GallerySection
+                currentImg={currentImg}
+                galleryImages={galleryImages}
+                gallery={gallery}
+                setGallery={setGallery}
+                productName={product.name}
+              />
             </div>
 
-            {/* Product info */}
-            <div className={styles.info}>
-              {/* Category + stock */}
-              <div className={styles.topMeta}>
-                <span className={styles.categoryBadge}>{product.category}</span>
-                <span className={`stock-badge ${stock.cls}`}>{stock.label}</span>
-              </div>
+            <div className={styles.divider} />
 
-              <h1 className={`display-md ${styles.productName}`}>{product.name}</h1>
+            {/* Description accordion */}
+            <Accordion title="DESCRIPTION" defaultOpen>
+              <p className={styles.descText}>{product.description}</p>
+            </Accordion>
 
-              {/* Price Row */}
-              <div className={styles.priceRow}>
-                <span className="price-current">PKR {displayPrice.toLocaleString()}</span>
-                {discountedPrice && (
-                  <>
-                    <span className="price-original">
-                      PKR {activeBasePrice.toLocaleString()}
-                    </span>
-                    <span className="badge badge-success">
-                      Save {product.discount_percentage}%
-                    </span>
-                  </>
-                )}
-                {selectedSize && (
-                  <span className="body-xs muted" style={{ alignSelf: 'center', marginLeft: '6px' }}>
-                    // {selectedSize.label} ({selectedSize.dims})
-                  </span>
-                )}
-              </div>
+            {/* Specifications accordion */}
+            {(product.material_specs || product.delivery_time || product.warranty_period) && (
+              <Accordion title="SPECIFICATIONS">
+                <dl className={styles.specList}>
+                  {product.material_specs && (
+                    <>
+                      <dt className={styles.specTerm}>Material & Specs</dt>
+                      <dd className={styles.specDef}>{getCleanSpecValue('material_specs', product.material_specs)}</dd>
+                    </>
+                  )}
+                  {product.delivery_time && (
+                    <>
+                      <dt className={styles.specTerm}>Delivery</dt>
+                      <dd className={styles.specDef}>{product.delivery_time}</dd>
+                    </>
+                  )}
+                  {product.warranty_period && (
+                    <>
+                      <dt className={styles.specTerm}>Warranty</dt>
+                      <dd className={styles.specDef}>{product.warranty_period}</dd>
+                    </>
+                  )}
+                  {product.care_instructions && (
+                    <>
+                      <dt className={styles.specTerm}>Care</dt>
+                      <dd className={styles.specDef}>{product.care_instructions}</dd>
+                    </>
+                  )}
+                </dl>
+              </Accordion>
+            )}
 
-              {/* Size Selector for Mousepads */}
-              {isMousepad && sizeVariants.length > 0 && (
-                <div className={styles.sizeSection} id="pdp-size-selector">
-                  <div className={styles.sizeHeader}>
-                    <h3 className={styles.sizeTitle}>SELECT DESKMAT SIZE</h3>
-                    <span className={styles.sizeHelpText}>
-                      Chosen: <strong style={{ color: '#FFFFFF' }}>{selectedSize?.label} ({selectedSize?.dims})</strong>
-                    </span>
-                  </div>
+            <div className={styles.divider} />
 
-                  <div className={styles.sizeGrid}>
-                    {sizeVariants.map((sz) => {
-                      const isSelected = selectedSize?.id === sz.id;
-                      return (
-                        <button
-                          key={sz.id}
-                          type="button"
-                          className={`${styles.sizeCard} ${isSelected ? styles.sizeCardActive : ''}`}
-                          onClick={() => setSelectedSize(sz)}
-                          id={`size-btn-${sz.id.toLowerCase()}`}
-                        >
-                          {sz.popular && <span className={styles.popularBadge}>POPULAR</span>}
-                          <span className={styles.sizeCardName}>{sz.label}</span>
-                          <span className={styles.sizeCardDims}>{sz.dims}</span>
-                          <span className={styles.sizeCardPrice}>PKR {sz.effectivePrice.toLocaleString()}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Description */}
-              <p className={`body-md muted ${styles.desc}`}>
-                {product.description}
-              </p>
-
-              {/* Quantity */}
-              <div className={styles.qtySection}>
-                <p className="form-label">Quantity</p>
-                <div className={styles.qtyControl}>
-                  <button
-                    className={styles.qtyBtn}
-                    onClick={() => setQty(Math.max(1, qty - 1))}
-                    aria-label="Decrease"
-                    disabled={qty <= 1}
-                  >−</button>
-                  <span className={styles.qtyNum}>{qty}</span>
-                  <button
-                    className={styles.qtyBtn}
-                    onClick={() => setQty(qty + 1)}
-                    aria-label="Increase"
-                    disabled={qty >= product.stock_quantity}
-                  >+</button>
-                </div>
-              </div>
-
-              {/* CTAs */}
-              <div className={styles.ctas}>
+            {/* Quantity + Add to Cart */}
+            <div className={styles.ctaRow}>
+              {/* Qty control */}
+              <div className={styles.qtyControl}>
                 <button
-                  className={`btn ${added ? 'btn-rgb' : 'btn-gold'} ${styles.addBtn}`}
-                  onClick={handleAddToCart}
-                  disabled={product.stock_quantity === 0}
-                  id="pdp-add-to-cart"
-                >
-                  {added
-                    ? '✓ Added to Cart'
-                    : product.stock_quantity === 0
-                    ? 'Out of Stock'
-                    : `Add to Cart — PKR ${(displayPrice * qty).toLocaleString()}`}
-                </button>
-                <a
-                  href={`https://wa.me/923000000000?text=${encodeURIComponent(waMessage)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-ghost"
-                  id="pdp-whatsapp-btn"
-                >
-                  <WAIcon /> Order via WhatsApp
-                </a>
+                  className={styles.qtyBtn}
+                  onClick={() => setQty(Math.max(1, qty - 1))}
+                  disabled={qty <= 1}
+                  aria-label="Decrease quantity"
+                >−</button>
+                <span className={styles.qtyNum}>{qty}</span>
+                <button
+                  className={styles.qtyBtn}
+                  onClick={() => setQty(qty + 1)}
+                  disabled={qty >= product.stock_quantity}
+                  aria-label="Increase quantity"
+                >+</button>
               </div>
 
-              {/* COD notice */}
-              <div className={styles.codBadge}>
-                <span style={{ color: 'var(--success)' }}>✓</span>
-                Cash on Delivery — pay in cash when your order arrives
-              </div>
+              {/* Add to cart */}
+              <button
+                className={`${styles.addBtn} ${added ? styles.addBtnAdded : ''}`}
+                onClick={handleAddToCart}
+                disabled={product.stock_quantity === 0}
+                id="pdp-add-to-cart"
+              >
+                {added
+                  ? '✓ ADDED'
+                  : product.stock_quantity === 0
+                  ? 'OUT OF STOCK'
+                  : 'ADD TO CART'}
+              </button>
+            </div>
 
-              {/* Info blocks */}
-              <div className={styles.infoBlocks}>
-                {INFO_BLOCKS.map(({ key, label, icon }) => {
-                  const val = getCleanSpecValue(key, product[key]);
-                  return val ? (
-                    <div key={key} className={styles.infoBlock}>
-                      <div className={styles.infoBlockIcon}>{icon}</div>
-                      <div>
-                        <p className={styles.infoBlockLabel}>{label}</p>
-                        <p className={styles.infoBlockValue}>{val}</p>
-                      </div>
-                    </div>
-                  ) : null;
-                })}
-              </div>
+            {/* Price total below CTA */}
+            {qty > 1 && (
+              <p className={styles.totalNote}>
+                Total: <strong>PKR {(displayPrice * qty).toLocaleString()}</strong>
+              </p>
+            )}
+
+            {/* WhatsApp */}
+            <a
+              href={`https://wa.me/923000000000?text=${encodeURIComponent(waMessage)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.waBtn}
+              id="pdp-whatsapp-btn"
+            >
+              <WAIcon /> ORDER VIA WHATSAPP
+            </a>
+
+            {/* COD */}
+            <div className={styles.codBadge}>
+              <span style={{ color: 'var(--success, #22c55e)' }}>✓</span>
+              Cash on Delivery — pay when your order arrives
             </div>
           </div>
         </div>
@@ -338,18 +471,10 @@ export default function ProductPage() {
   );
 }
 
-function DeliveryIcon() {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>;
-}
-function ShieldIcon() {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
-}
-function InfoIcon() {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>;
-}
-function SpecsIcon() {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>;
-}
 function WAIcon() {
-  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>;
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+    </svg>
+  );
 }
