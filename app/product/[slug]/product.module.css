@@ -119,8 +119,9 @@
 }
 
 .mainImg {
-  object-fit: contain;
-  padding: 12px;
+  object-fit: cover;
+  object-position: center;
+  padding: 0;
 }
 
 .imgPlaceholder {

@@ -14,13 +14,205 @@
   flex-wrap: wrap;
 }
 
-.toolbar {
+.filterSection {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.search { max-width: 300px; }
+.searchAndSortRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.searchBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 260px;
+  max-width: 380px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.search {
+  padding-left: 36px !important;
+  width: 100%;
+}
+
+.controlsRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.categoryPills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pillBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  white-space: nowrap;
+}
+
+.pillBtn:hover {
+  border-color: var(--border-mid);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
+
+.pillBtn.active {
+  background: #E60012;
+  border-color: #E60012;
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(230, 0, 18, 0.4);
+}
+
+.pillCount {
+  font-size: 0.68rem;
+  opacity: 0.75;
+  font-weight: 500;
+}
+
+.secondaryFiltersRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.selectInput {
+  padding: 6px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  outline: none;
+  transition: all var(--duration-fast);
+}
+
+.selectInput:focus {
+  border-color: var(--brand-red);
+  box-shadow: 0 0 8px rgba(230, 0, 18, 0.25);
+}
+
+.selectInputActive {
+  border-color: rgba(230, 0, 18, 0.5) !important;
+  background: rgba(230, 0, 18, 0.08) !important;
+  color: #FF667A !important;
+}
+
+.resetBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  color: #FF5A5A;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.resetBtn:hover {
+  background: rgba(255, 68, 68, 0.2);
+  border-color: #FF5A5A;
+  color: #FFF;
+}
+
+.catBadgeBtn {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(230, 0, 18, 0.12);
+  border: 1px solid rgba(230, 0, 18, 0.25);
+  color: #FF4D61;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.catBadgeBtn:hover {
+  background: rgba(230, 0, 18, 0.25);
+  border-color: #FF334B;
+  color: #FFF;
+}
+
+.catBadgeActive {
+  background: #E60012 !important;
+  border-color: #FF2A3D !important;
+  color: #FFF !important;
+  box-shadow: 0 0 8px rgba(230, 0, 18, 0.4);
+}
+
+.tagBtn {
+  font-size: 0.55rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #9A9A9F;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.tagBtn:hover {
+  background: rgba(230, 0, 18, 0.15);
+  color: #FF334B;
+  border-color: rgba(230, 0, 18, 0.35);
+}
+
+.tagBtnActive {
+  background: #E60012 !important;
+  color: #FFFFFF !important;
+  border-color: #FF2A3D !important;
+  box-shadow: 0 0 8px rgba(230, 0, 18, 0.4);
+}
 
 .loading {
   display: flex;
