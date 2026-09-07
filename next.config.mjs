@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
+    proxyClientMaxBodySize: '50mb',
+  },
   images: {
     qualities: [75, 90, 100],
     remotePatterns: [

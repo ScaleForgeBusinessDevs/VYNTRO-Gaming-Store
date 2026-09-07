@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getServiceSupabase } from '@/lib/supabaseAdmin';
+import sharp from 'sharp';
+
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60;
 
 export async function POST(request) {
   try {
@@ -24,14 +28,30 @@ export async function POST(request) {
 
     for (const file of files) {
       if (typeof file === 'string') continue;
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const ext = file.name.split('.').pop() || 'jpg';
+      let buffer = Buffer.from(await file.arrayBuffer());
+      let ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      let mimeType = file.type || 'image/jpeg';
+
+      // If file is large (> 1MB), optimize with sharp
+      if (buffer.length > 1024 * 1024 && !file.type.includes('svg')) {
+        try {
+          buffer = await sharp(buffer)
+            .resize({ width: 2048, height: 2048, fit: 'inside', withoutEnlargement: true })
+            .webp({ quality: 85 })
+            .toBuffer();
+          ext = 'webp';
+          mimeType = 'image/webp';
+        } catch {
+          // Fallback to original buffer
+        }
+      }
+
       const path = `products/${slug}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from('product-images')
         .upload(path, buffer, {
-          contentType: file.type || 'image/jpeg',
+          contentType: mimeType,
           upsert: true,
         });
 

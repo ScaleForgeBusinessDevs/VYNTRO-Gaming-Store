@@ -37,6 +37,83 @@ function slugify(str) {
   return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+async function parseResponseJson(res) {
+  const text = await res.text().catch(() => '');
+  if (!text) {
+    return { ok: res.ok, status: res.status, data: {} };
+  }
+  try {
+    const data = JSON.parse(text);
+    return { ok: res.ok, status: res.status, data };
+  } catch {
+    let message = text;
+    if (res.status === 413 || text.toLowerCase().includes('entity too large') || text.toLowerCase().includes('body exceeded')) {
+      message = 'Image upload is too large for the server. Please try a smaller image (under 10MB) or use WebP/JPEG.';
+    } else if (text.startsWith('<') || text.length > 200) {
+      message = `Server error (status ${res.status}): ${res.statusText || 'Operation failed'}`;
+    }
+    return { ok: false, status: res.status, data: { error: message } };
+  }
+}
+
+async function compressImageFile(file, maxWidth = 1920, maxHeight = 1920, quality = 0.88) {
+  if (typeof window === 'undefined' || !file || !file.type || !file.type.startsWith('image/') || file.type === 'image/svg+xml') {
+    return file;
+  }
+  // Skip compression if already <= 1.2MB
+  if (file.size <= 1200 * 1024) {
+    return file;
+  }
+
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = document.createElement('img');
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          if (width / maxWidth > height / maxHeight) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const outType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+        canvas.toBlob(
+          (blob) => {
+            if (blob && blob.size < file.size) {
+              const compressedFile = new File([blob], file.name, {
+                type: outType,
+                lastModified: Date.now(),
+              });
+              resolve(compressedFile);
+            } else {
+              resolve(file);
+            }
+          },
+          outType,
+          quality
+        );
+      };
+      img.onerror = () => resolve(file);
+      img.src = e.target.result;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function ProductFormPage({ isEdit = false }) {
   const router = useRouter();
   const params = useParams();
@@ -89,10 +166,11 @@ export default function ProductFormPage({ isEdit = false }) {
   const [uploadingVariantIdx, setUploadingVariantIdx] = useState(null);
 
   async function handleVariantFileUpload(variantIdx, e) {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
+    const rawFiles = Array.from(e.target.files);
+    if (!rawFiles.length) return;
     setUploadingVariantIdx(variantIdx);
     try {
+      const files = await Promise.all(rawFiles.map((f) => compressImageFile(f)));
       const formData = new FormData();
       formData.append('slug', form.slug.trim() || 'variant');
       files.forEach((file) => formData.append('files', file));
@@ -101,8 +179,8 @@ export default function ProductFormPage({ isEdit = false }) {
         method: 'POST',
         body: formData,
       });
-      const uploadData = await uploadRes.json();
-      if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload failed');
+      const { ok, data: uploadData } = await parseResponseJson(uploadRes);
+      if (!ok) throw new Error(uploadData.error || 'Upload failed');
 
       const newUrls = uploadData.urls || [];
       setColorVariants((prev) => {
@@ -448,16 +526,17 @@ export default function ProductFormPage({ isEdit = false }) {
       // 1. Upload any new images via admin API
       let uploadedUrls = [];
       if (newFiles.length > 0) {
+        const compressedFiles = await Promise.all(newFiles.map((f) => compressImageFile(f)));
         const formData = new FormData();
         formData.append('slug', form.slug.trim());
-        newFiles.forEach((file) => formData.append('files', file));
+        compressedFiles.forEach((file) => formData.append('files', file));
 
         const uploadRes = await fetch('/api/admin/upload', {
           method: 'POST',
           body: formData,
         });
-        const uploadData = await uploadRes.json();
-        if (!uploadRes.ok) {
+        const { ok: uploadOk, data: uploadData } = await parseResponseJson(uploadRes);
+        if (!uploadOk) {
           throw new Error(uploadData.error || 'Failed to upload images');
         }
         uploadedUrls = uploadData.urls || [];
@@ -558,8 +637,8 @@ export default function ProductFormPage({ isEdit = false }) {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
+      const { ok: saveOk, data } = await parseResponseJson(res);
+      if (!saveOk) {
         throw new Error(data.error || 'Failed to save product');
       }
 
@@ -582,10 +661,10 @@ export default function ProductFormPage({ isEdit = false }) {
       const res = await fetch(`/api/admin/products/${productId}`, {
         method: 'DELETE',
       });
-      if (res.ok) {
+      const { ok: deleteOk, data } = await parseResponseJson(res);
+      if (deleteOk) {
         router.push('/admin/products');
       } else {
-        const data = await res.json();
         alert(data.error || 'Failed to delete product');
         setDeleting(false);
       }
