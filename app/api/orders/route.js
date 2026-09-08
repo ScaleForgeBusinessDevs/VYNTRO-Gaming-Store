@@ -133,8 +133,17 @@ export async function POST(request) {
         }
         realCogs += costPrice * item.quantity;
 
-        const displayName = item.variant
-          ? `${item.name} (${item.variant}${item.variantDims ? ` - ${item.variantDims}` : ''})`
+        const variantParts = [];
+        if (item.color) {
+          variantParts.push(`Color: ${item.color}`);
+        }
+        if (item.variant) {
+          const sizeText = item.variantDims ? `${item.variant} (${item.variantDims})` : item.variant;
+          variantParts.push(`Size: ${sizeText}`);
+        }
+
+        const displayName = variantParts.length > 0
+          ? `${item.name} [${variantParts.join(' | ')}]`
           : item.name;
 
         return {
@@ -177,7 +186,16 @@ async function sendConfirmationEmail(customer, orderNumber, items, total) {
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   const itemsHtml = items
-    .map((i) => `<tr><td>${i.name}</td><td>× ${i.quantity}</td><td>PKR ${(i.price * i.quantity).toLocaleString()}</td></tr>`)
+    .map((i) => {
+      const vParts = [];
+      if (i.color) vParts.push(`Color: ${i.color}`);
+      if (i.variant) {
+        const sizeText = i.variantDims ? `${i.variant} (${i.variantDims})` : i.variant;
+        vParts.push(`Size: ${sizeText}`);
+      }
+      const vText = vParts.length > 0 ? `<div style="font-size:11px;color:#FF334B;font-weight:700;margin-top:2px;">[${vParts.join(' | ')}]</div>` : '';
+      return `<tr><td>${i.name}${vText}</td><td>× ${i.quantity}</td><td>PKR ${(i.price * i.quantity).toLocaleString()}</td></tr>`;
+    })
     .join('');
 
   await resend.emails.send({

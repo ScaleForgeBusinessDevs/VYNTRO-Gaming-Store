@@ -248,6 +248,14 @@ export default function CheckoutPage() {
                 <div key={item.id} className={styles.summaryItem}>
                   <div>
                     <p className="body-sm">{item.name}</p>
+                    {item.color && (
+                      <p style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '2px 0 1px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        {item.colorHex && (
+                          <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: item.colorHex, border: '1px solid rgba(255,255,255,0.3)', flexShrink: 0 }} />
+                        )}
+                        COLOR: {item.color}
+                      </p>
+                    )}
                     {item.variant && (
                       <p style={{ fontSize: '0.72rem', color: '#FF334B', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '1px 0' }}>
                         SIZE: {item.variant} {item.variantDims ? `(${item.variantDims})` : ''}

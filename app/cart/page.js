@@ -66,10 +66,22 @@ export default function CartPage() {
                       <Link href={`/product/${item.slug ?? '#'}`} className={styles.itemName}>
                         {item.name}
                       </Link>
-                      {item.variant && (
-                        <p style={{ fontSize: '0.75rem', color: '#FF334B', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '2px 0 6px' }}>
-                          SIZE: {item.variant} {item.variantDims ? `(${item.variantDims})` : ''}
-                        </p>
+                      {(item.color || item.variant) && (
+                        <div style={{ margin: '2px 0 6px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          {item.color && (
+                            <p style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              {item.colorHex && (
+                                <span style={{ display: 'inline-block', width: 9, height: 9, borderRadius: '50%', background: item.colorHex, border: '1px solid rgba(255,255,255,0.3)', flexShrink: 0 }} />
+                              )}
+                              COLOR: {item.color}
+                            </p>
+                          )}
+                          {item.variant && (
+                            <p style={{ fontSize: '0.75rem', color: '#FF334B', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
+                              SIZE: {item.variant} {item.variantDims ? `(${item.variantDims})` : ''}
+                            </p>
+                          )}
+                        </div>
                       )}
                       <p className={styles.itemUnitPrice}>
                         PKR {item.price.toLocaleString()} each
@@ -117,7 +129,14 @@ export default function CartPage() {
                 <div className={styles.summaryRows}>
                   {items.map((item) => (
                     <div key={item.id} className={styles.summaryRow}>
-                      <span className="body-sm muted">{item.name} × {item.quantity}</span>
+                      <div className="body-sm muted" style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span>{item.name} × {item.quantity}</span>
+                        {(item.color || item.variant) && (
+                          <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)' }}>
+                            {[item.color && `Color: ${item.color}`, item.variant && `Size: ${item.variant}`].filter(Boolean).join(' | ')}
+                          </span>
+                        )}
+                      </div>
                       <span className="body-sm">PKR {(item.price * item.quantity).toLocaleString()}</span>
                     </div>
                   ))}

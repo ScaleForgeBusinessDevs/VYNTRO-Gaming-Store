@@ -142,11 +142,23 @@ function CartItem({ item, onRemove, onQtyChange }) {
 
         <p className={styles.itemName}>{item.name}</p>
 
-        {/* Show size variant for regular products */}
-        {!item.isBundle && item.variant && (
-          <p className={styles.itemVariant} style={{ fontSize: '0.72rem', color: '#FF334B', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '-2px 0 4px' }}>
-            SIZE: {item.variant} {item.variantDims ? `(${item.variantDims})` : ''}
-          </p>
+        {/* Show color and size variant for regular products */}
+        {!item.isBundle && (item.color || item.variant) && (
+          <div style={{ margin: '-2px 0 5px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            {item.color && (
+              <p className={styles.itemVariant} style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                {item.colorHex && (
+                  <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: item.colorHex, border: '1px solid rgba(255,255,255,0.3)', flexShrink: 0 }} />
+                )}
+                COLOR: {item.color}
+              </p>
+            )}
+            {item.variant && (
+              <p className={styles.itemVariant} style={{ fontSize: '0.72rem', color: '#FF334B', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
+                SIZE: {item.variant} {item.variantDims ? `(${item.variantDims})` : ''}
+              </p>
+            )}
+          </div>
         )}
 
         {/* Show included items for bundles */}

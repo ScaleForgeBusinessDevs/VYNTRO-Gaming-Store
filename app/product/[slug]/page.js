@@ -210,7 +210,7 @@ export default function ProductPage() {
   const displayPrice = discountedPrice ?? priceWithColor;
 
   function handleAddToCart() {
-    addItem(product, qty, selectedSize);
+    addItem(product, qty, selectedSize, selectedColor);
     setAdded(true);
     setTimeout(() => setAdded(false), 2200);
   }

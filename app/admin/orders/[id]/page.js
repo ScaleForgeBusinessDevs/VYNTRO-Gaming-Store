@@ -105,7 +105,7 @@ export default function OrderDetailPage() {
               <tbody>
                 {(order.order_items ?? []).map((item) => (
                   <tr key={item.id}>
-                    <td>{item.product_name_snapshot}</td>
+                    <td>{renderItemSnapshot(item.product_name_snapshot)}</td>
                     <td>{item.quantity}</td>
                     <td>PKR {item.unit_price?.toLocaleString()}</td>
                     <td className={styles.costCell}>PKR {item.unit_cost?.toLocaleString()}</td>
@@ -194,6 +194,44 @@ function FinRow({ label, value, color }) {
     <div className={styles.finRow}>
       <span className="body-sm muted">{label}</span>
       <span className="body-sm" style={{ fontWeight: 600, color: c[color] ?? 'var(--text-primary)' }}>{value}</span>
+    </div>
+  );
+}
+
+function renderItemSnapshot(snapshot) {
+  if (!snapshot) return '—';
+  const match = snapshot.match(/^(.*?)\s*\[(.*?)\]$/);
+  if (!match) return snapshot;
+
+  const [, name, variantStr] = match;
+  const parts = variantStr.split('|').map((p) => p.trim());
+
+  return (
+    <div>
+      <div style={{ fontWeight: 600 }}>{name}</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '4px' }}>
+        {parts.map((p, idx) => {
+          const isColor = p.toLowerCase().startsWith('color:');
+          return (
+            <span
+              key={idx}
+              style={{
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                letterSpacing: '0.04em',
+                padding: '2px 7px',
+                borderRadius: '4px',
+                background: isColor ? 'rgba(56, 189, 248, 0.12)' : 'rgba(255, 51, 75, 0.12)',
+                color: isColor ? '#38bdf8' : '#ff4d61',
+                border: isColor ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid rgba(255, 51, 75, 0.3)',
+                textTransform: 'uppercase',
+              }}
+            >
+              {p}
+            </span>
+          );
+        })}
+      </div>
     </div>
   );
 }
