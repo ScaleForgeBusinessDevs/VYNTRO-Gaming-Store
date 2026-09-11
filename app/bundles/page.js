@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Navbar from '@/components/storefront/Navbar';
 import Footer from '@/components/storefront/Footer';
+import CyberpunkPageHeader from '@/components/storefront/CyberpunkPageHeader';
 import { BUNDLES } from '@/lib/bundles';
 import styles from './bundles.module.css';
 
@@ -12,20 +13,14 @@ export default function BundlesPage() {
       <Navbar />
       <main className={styles.main}>
         <div className="container">
-          {/* Page Header */}
-          <div className={styles.header}>
-            <div className={styles.eyebrow}>
-              <span className={styles.eyebrowLine} />
-              <span className={styles.eyebrowText}>VYNTRO CURATED</span>
-              <span className={styles.eyebrowLine} />
-            </div>
-            <h1 className={styles.title}>
-              BUNDLE <span className={styles.titleAccent}>DEALS</span>
-            </h1>
-            <p className={styles.subtitle}>
-              Hand-picked combinations of our best gear — priced to save you more.
-            </p>
-          </div>
+          {/* Cyberpunk Modern Header */}
+          <CyberpunkPageHeader
+            // eyebrow="VYNTRO CURATED // VALUE ARSENAL"
+            titlePrefix="BUNDLE"
+            titleAccent="DEALS"
+            description="Hand-picked combinations of our best gear — precision matched and priced to maximize your setup savings."
+            code="COMBO SAVINGS"
+          />
 
           {/* Bundle Cards Grid */}
           <div className={styles.grid}>

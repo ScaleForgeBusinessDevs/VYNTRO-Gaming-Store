@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, Suspense } from 'react';
 import Navbar from '@/components/storefront/Navbar';
 import Footer from '@/components/storefront/Footer';
 import ProductCard from '@/components/storefront/ProductCard';
+import CyberpunkPageHeader from '@/components/storefront/CyberpunkPageHeader';
 import styles from './CategoryStorePage.module.css';
 
 export default function CategoryStorePage({
@@ -214,20 +215,14 @@ export default function CategoryStorePage({
       <Navbar />
       <main className={styles.main}>
         <div className={styles.container}>
-          {/* Header Block */}
-          <div className={styles.header}>
-            {eyebrow && (
-              <div className={styles.eyebrow}>
-                <span className={styles.eyebrowLine} />
-                <span className={styles.eyebrowText}>{eyebrow}</span>
-                <span className={styles.eyebrowLine} />
-              </div>
-            )}
-            <h1 className={styles.title}>
-              {titlePrefix} <span className={styles.titleAccent}>{titleAccent}</span>
-            </h1>
-            {description && <p className={styles.subtitle}>{description}</p>}
-          </div>
+          {/* Cyberpunk Modern Header */}
+          <CyberpunkPageHeader
+            eyebrow={eyebrow}
+            titlePrefix={titlePrefix}
+            titleAccent={titleAccent}
+            description={description}
+            code="PRECISION DEPLOYED"
+          />
 
           {/* Filter Panel */}
           <div className={styles.filterSection}>

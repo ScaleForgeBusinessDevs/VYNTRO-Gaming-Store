@@ -738,3 +738,115 @@
   line-height: 1;
 }
 
+/* Mousepad Size Pricing Grid & Cards */
+.sizePricingSection {
+  background: var(--bg-surface, #131316);
+  border: 1px solid var(--border-subtle, #1F1F24);
+  border-radius: var(--radius-md, 8px);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sizePricingHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.autoCalcBtn {
+  background: var(--bg-elevated, #1A1A1E);
+  border: 1px solid var(--border-mid, #2A2A32);
+  color: var(--text-primary, #F5F3EF);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.autoCalcBtn:hover {
+  border-color: var(--gold, #E60012);
+  color: #fff;
+}
+
+.sizePricingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.sizePricingCard {
+  background: var(--bg-elevated, #1A1A1E);
+  border: 1px solid var(--border-subtle, #1F1F24);
+  border-radius: var(--radius-sm, 4px);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.15s;
+}
+
+.sizePricingCard:focus-within {
+  border-color: var(--border-light, #3A3A45);
+}
+
+.sizePricingCardZero {
+  border-color: rgba(255, 107, 107, 0.3) !important;
+  background: rgba(255, 107, 107, 0.04) !important;
+}
+
+.sizeCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sizeCardName {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--text-primary, #F5F3EF);
+}
+
+.sizeCardDims {
+  font-size: 0.68rem;
+  color: var(--text-muted, #5A5A62);
+  font-family: monospace;
+}
+
+.sizeInputWrap {
+  display: flex;
+  align-items: center;
+  background: var(--bg-primary, #0A0A0C);
+  border: 1px solid var(--border-subtle, #1F1F24);
+  border-radius: var(--radius-sm, 4px);
+  overflow: hidden;
+}
+
+.sizeCurrency {
+  padding: 0 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted, #5A5A62);
+  background: rgba(255, 255, 255, 0.03);
+  border-right: 1px solid var(--border-subtle, #1F1F24);
+  line-height: 32px;
+}
+
+.sizeInputField {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary, #F5F3EF);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  outline: none;
+}
+
+

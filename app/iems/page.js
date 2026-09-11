@@ -110,7 +110,7 @@ const INITIAL_IEMS = [
 export default function IEMsPage() {
   return (
     <CategoryStorePage
-      eyebrow="PINPOINT DIRECTIONAL AUDIO // DUAL-DRIVER SPATIAL TUNING"
+      // eyebrow="PINPOINT DIRECTIONAL AUDIO // DUAL-DRIVER SPATIAL TUNING"
       titlePrefix="GAMING"
       titleAccent="IEMS"
       description="Zero audio latency and surgical spatial separation. In-ear monitors tuned specifically to reveal opponent footfalls and subtle audio cues."

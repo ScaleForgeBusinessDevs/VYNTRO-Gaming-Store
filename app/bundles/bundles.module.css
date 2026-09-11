@@ -36,6 +36,7 @@
 }
 
 .title {
+  font-family: var(--font-cyber, 'Orbitron'), 'Oxanium', sans-serif;
   font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 800;
   letter-spacing: 0.08em;

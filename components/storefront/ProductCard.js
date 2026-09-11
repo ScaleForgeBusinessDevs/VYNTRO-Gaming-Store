@@ -77,6 +77,7 @@ export default function ProductCard({ product }) {
     ? product.selling_price * (1 - product.discount_percentage / 100)
     : null;
 
+  const isOutOfStock = (product.stock_quantity ?? 0) === 0;
   const displayPrice = discountedPrice ?? product.selling_price;
   const imageUrl = getProductImage(product);
 
@@ -85,7 +86,7 @@ export default function ProductCard({ product }) {
   return (
     <Link
       href={`/product/${product.slug}`}
-      className={styles.card}
+      className={`${styles.card} ${isOutOfStock ? styles.cardOutOfStock : ''}`}
       id={`product-card-${product.id}`}
     >
       {/* Background Image — Exactly matching CategoryGrid */}
@@ -99,6 +100,14 @@ export default function ProductCard({ product }) {
         />
         {/* Dark overlay so text is readable */}
         <div className={styles.overlay} />
+
+        {/* Out of Stock Banner across top */}
+        {isOutOfStock && (
+          <div className={styles.outOfStockBanner}>
+            <span className={styles.outOfStockDot} />
+            OUT OF STOCK
+          </div>
+        )}
       </div>
 
       {/* Centered / Pinned Bottom Content */}
@@ -118,7 +127,9 @@ export default function ProductCard({ product }) {
               </span>
             )}
             <span className={styles.sep}>//</span>
-            <span className={styles.shopNowText}>SHOP NOW</span>
+            <span className={isOutOfStock ? styles.outOfStockText : styles.shopNowText}>
+              {isOutOfStock ? 'OUT OF STOCK' : 'SHOP NOW'}
+            </span>
           </div>
           <div className={styles.accentLine} />
         </div>

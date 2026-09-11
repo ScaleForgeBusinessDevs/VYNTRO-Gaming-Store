@@ -1,0 +1,518 @@
+/* ─── Cyberpunk Modern Page Header (Full Width & Cursor-Reactive) ───────── */
+
+.headerContainer {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 0 42px;
+  padding: clamp(48px, 6vw, 76px) clamp(24px, 5vw, 64px);
+  background: radial-gradient(
+      ellipse 85% 70% at 50% -20%,
+      rgba(230, 0, 18, 0.16) 0%,
+      rgba(230, 0, 18, 0.03) 55%,
+      transparent 80%
+    ),
+    linear-gradient(180deg, rgba(18, 18, 24, 0.9) 0%, rgba(10, 10, 14, 0.98) 100%);
+  border: 1px solid rgba(230, 0, 18, 0.22);
+  border-radius: 12px;
+  box-shadow: 
+    0 0 45px rgba(230, 0, 18, 0.09),
+    0 24px 60px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  text-align: center;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* ── Interactive Hover State: Bright Orange Cyber Flare ─────────────────── */
+.headerContainer.isHovered {
+  border-color: rgba(255, 119, 0, 0.55);
+  box-shadow: 
+    0 0 60px rgba(255, 119, 0, 0.22),
+    0 0 30px rgba(255, 80, 0, 0.18),
+    0 24px 60px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 140, 0, 0.4);
+}
+
+/* ── Interactive Cursor Spotlight Layer ─────────────────────────────────── */
+.cursorSpotlight {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle 460px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 119, 0, 0.28) 0%,
+    rgba(255, 70, 0, 0.14) 38%,
+    transparent 72%
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: 1;
+}
+
+.isHovered .cursorSpotlight {
+  opacity: 1;
+}
+
+/* ── Cyber Grid & Scanline Pattern ───────────────────────────────────────── */
+.cyberGridBackdrop {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+  opacity: 0.7;
+  mask-image: radial-gradient(ellipse 90% 80% at center, black 40%, transparent 95%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at center, black 40%, transparent 95%);
+  z-index: 0;
+}
+
+/* High-tech dynamic grid highlight beneath cursor (Bright Orange) */
+.cyberGridCursorGlow {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 119, 0, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 119, 0, 0.25) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+  opacity: 0;
+  mask-image: radial-gradient(circle 360px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle 360px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 80%);
+  transition: opacity 0.35s ease;
+  z-index: 1;
+}
+
+.isHovered .cyberGridCursorGlow {
+  opacity: 1;
+}
+
+/* Periodic cyber laser scanline sweep */
+.cyberScanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 119, 0, 0.85) 50%, transparent);
+  box-shadow: 0 0 14px rgba(255, 119, 0, 0.9);
+  opacity: 0.45;
+  pointer-events: none;
+  animation: scanlineSweep 7s linear infinite;
+  z-index: 2;
+}
+
+@keyframes scanlineSweep {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.6;
+  }
+  85% {
+    opacity: 0.6;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+/* ── Ambient Top & Bottom Laser Lines ────────────────────────────────────── */
+.ambientGlowTop {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #E60012 30%, #FF334B 50%, #E60012 70%, transparent);
+  box-shadow: 0 0 20px rgba(230, 0, 18, 0.9);
+  transition: all 0.4s ease;
+  z-index: 2;
+}
+
+.isHovered .ambientGlowTop {
+  width: 85%;
+  background: linear-gradient(90deg, transparent, #FF7700 25%, #FFA500 50%, #FF7700 75%, transparent);
+  box-shadow: 0 0 28px rgba(255, 119, 0, 0.95), 0 0 45px rgba(255, 80, 0, 0.7);
+}
+
+.ambientGlowBottom {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(230, 0, 18, 0.6), transparent);
+  box-shadow: 0 0 10px rgba(230, 0, 18, 0.5);
+  transition: all 0.4s ease;
+  z-index: 2;
+}
+
+.isHovered .ambientGlowBottom {
+  width: 55%;
+  background: linear-gradient(90deg, transparent, rgba(255, 119, 0, 0.8), transparent);
+  box-shadow: 0 0 16px rgba(255, 119, 0, 0.8);
+}
+
+/* ── HUD Corner Tech Brackets ─────────────────────────────────────────────── */
+.cornerTL,
+.cornerTR,
+.cornerBL,
+.cornerBR {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: #E60012;
+  border-style: solid;
+  pointer-events: none;
+  opacity: 0.85;
+  transition: all 0.3s ease;
+  z-index: 3;
+}
+
+.cornerTL {
+  top: 10px;
+  left: 12px;
+  border-width: 2px 0 0 2px;
+}
+
+.cornerTR {
+  top: 10px;
+  right: 12px;
+  border-width: 2px 2px 0 0;
+}
+
+.cornerBL {
+  bottom: 10px;
+  left: 12px;
+  border-width: 0 0 2px 2px;
+}
+
+.cornerBR {
+  bottom: 10px;
+  right: 12px;
+  border-width: 0 2px 2px 0;
+}
+
+/* Bracket glow and expansion on hover (Bright Orange) */
+.isHovered .cornerTL,
+.isHovered .cornerTR,
+.isHovered .cornerBL,
+.isHovered .cornerBR {
+  border-color: #FF7700;
+  box-shadow: 0 0 14px rgba(255, 119, 0, 0.95);
+  transform: scale(1.15);
+}
+
+/* ── Flank Decorative Cyber Telemetry (Wide Screens) ─────────────────────── */
+.flankLeft,
+.flankRight {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-cyber), 'Orbitron', monospace, sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+  z-index: 2;
+  transition: color 0.3s ease;
+}
+
+.flankLeft {
+  left: 28px;
+}
+
+.flankRight {
+  right: 28px;
+}
+
+.isHovered .flankLeft,
+.isHovered .flankRight {
+  color: rgba(255, 140, 0, 0.85);
+}
+
+.flankLine {
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(230, 0, 18, 0.4), transparent);
+  transition: background 0.3s ease;
+}
+
+.flankLeft .flankLine {
+  background: linear-gradient(90deg, transparent, rgba(230, 0, 18, 0.5));
+}
+
+.isHovered .flankLine {
+  background: linear-gradient(90deg, transparent, rgba(255, 119, 0, 0.85));
+}
+
+.flankMeter {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 14px;
+}
+
+.meterBar {
+  width: 2px;
+  height: 6px;
+  background: rgba(230, 0, 18, 0.5);
+  border-radius: 1px;
+  transition: all 0.3s ease;
+}
+
+.meterBar:nth-child(2) { height: 10px; }
+.meterBar:nth-child(3) { height: 14px; }
+.meterBar:nth-child(4) { height: 8px; }
+
+.isHovered .meterBar {
+  background: #FF7700;
+  box-shadow: 0 0 10px rgba(255, 119, 0, 0.9);
+}
+
+/* ── Central Content Wrapper ─────────────────────────────────────────────── */
+.contentWrapper {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  max-width: 960px;
+}
+
+/* ── Eyebrow Badge Pill ──────────────────────────────────────────────────── */
+.eyebrowBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(230, 0, 18, 0.08);
+  border: 1px solid rgba(230, 0, 18, 0.35);
+  border-radius: 20px;
+  padding: 6px 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 22px rgba(230, 0, 18, 0.18);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.isHovered .eyebrowBadge {
+  border-color: rgba(255, 119, 0, 0.6);
+  background: rgba(255, 119, 0, 0.12);
+  box-shadow: 0 0 28px rgba(255, 119, 0, 0.3);
+}
+
+.beaconDot {
+  width: 7px;
+  height: 7px;
+  background-color: #E60012;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #FF2A3D;
+  animation: beaconPulse 1.8s infinite ease-in-out;
+  transition: all 0.3s ease;
+}
+
+.isHovered .beaconDot {
+  background-color: #FF7700;
+  box-shadow: 0 0 14px #FF7700, 0 0 22px rgba(255, 119, 0, 0.85);
+}
+
+@keyframes beaconPulse {
+  0%, 100% {
+    opacity: 0.6;
+    box-shadow: 0 0 4px #E60012;
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 14px #FF2A3D, 0 0 22px rgba(230, 0, 18, 0.6);
+  }
+}
+
+.eyebrowText {
+  font-family: var(--font-cyber), 'Orbitron', 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #FF4D5E;
+  transition: color 0.3s ease;
+}
+
+.isHovered .eyebrowText {
+  color: #FFA500;
+}
+
+/* ── Main Cyber Heading with Orbitron & Hover Reactivity ──────────────────── */
+.title {
+  font-family: var(--font-cyber, 'Orbitron'), 'Oxanium', sans-serif;
+  font-size: clamp(2.3rem, 5.2vw, 4.4rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  margin: 0;
+  line-height: 1.1;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.9);
+  transition: all 0.35s ease;
+}
+
+.titlePrefix {
+  color: #FFFFFF;
+  position: relative;
+  display: inline-block;
+  letter-spacing: 0.08em;
+  transition: color 0.3s ease;
+}
+
+.titleAccent {
+  color: #E60012;
+  display: inline-block;
+  letter-spacing: 0.08em;
+  text-shadow: 
+    0 0 24px rgba(230, 0, 18, 0.85),
+    0 0 60px rgba(230, 0, 18, 0.45);
+  position: relative;
+  transition: all 0.35s ease;
+}
+
+/* Bright Orange color shift on hover */
+.isHovered .titleAccent {
+  color: #FFA012;
+  text-shadow: 
+    0 0 24px rgba(255, 119, 0, 0.95),
+    0 0 50px rgba(255, 80, 0, 0.75),
+    0 0 90px rgba(255, 119, 0, 0.5);
+}
+
+/* ── Cyber Laser Beam Divider ────────────────────────────────────────────── */
+.laserDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 520px;
+  margin: 22px auto 20px;
+  position: relative;
+}
+
+.laserLineLeft {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(230, 0, 18, 0.85));
+  box-shadow: 0 0 10px rgba(230, 0, 18, 0.6);
+  transition: all 0.3s ease;
+}
+
+.isHovered .laserLineLeft {
+  background: linear-gradient(90deg, transparent, rgba(255, 119, 0, 0.95));
+  box-shadow: 0 0 14px rgba(255, 119, 0, 0.9);
+}
+
+.laserCenterReticle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #E60012;
+  font-size: 0.65rem;
+  transition: color 0.3s ease;
+}
+
+.diamond {
+  width: 7px;
+  height: 7px;
+  background: #E60012;
+  transform: rotate(45deg);
+  box-shadow: 0 0 10px #FF334B;
+  transition: all 0.3s ease;
+}
+
+.isHovered .diamond {
+  background: #FF7700;
+  box-shadow: 0 0 14px #FF7700;
+}
+
+.crosshairText {
+  font-family: var(--font-cyber), 'Orbitron', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  color: #A1A1AA;
+  transition: color 0.3s ease;
+}
+
+.isHovered .crosshairText {
+  color: #FFE0B2;
+}
+
+.laserLineRight {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(230, 0, 18, 0.85), transparent);
+  box-shadow: 0 0 10px rgba(230, 0, 18, 0.6);
+  transition: all 0.3s ease;
+}
+
+.isHovered .laserLineRight {
+  background: linear-gradient(90deg, rgba(255, 119, 0, 0.95), transparent);
+  box-shadow: 0 0 14px rgba(255, 119, 0, 0.9);
+}
+
+/* ── Subtitle / Description ──────────────────────────────────────────────── */
+.subtitle {
+  font-family: var(--font-ui), 'Inter', sans-serif;
+  font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+  font-weight: 400;
+  color: #A1A1AA;
+  max-width: 720px;
+  margin: 0 auto;
+  line-height: 1.7;
+  letter-spacing: 0.015em;
+  transition: color 0.3s ease;
+}
+
+.isHovered .subtitle {
+  color: #E4E4E7;
+}
+
+/* ── Responsive Queries ──────────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .flankLeft,
+  .flankRight {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .headerContainer {
+    padding: 36px 18px 30px;
+    margin-bottom: 28px;
+  }
+
+  .eyebrowBadge {
+    padding: 4px 14px;
+    margin-bottom: 14px;
+  }
+
+  .eyebrowText {
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+  }
+
+  .laserDivider {
+    margin: 16px auto 16px;
+    max-width: 320px;
+  }
+}

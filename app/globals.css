@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Oxanium:wght@700;800;900&family=Rajdhani:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* ============================================================
    DESIGN TOKENS
@@ -53,8 +53,11 @@
   --glow-cyan:  0 0 32px rgba(94,231,255,0.15);
 
   /* Typography scale */
-  --font-display: 'Rajdhani', var(--font-sans), sans-serif;
+  --font-cyber:   'Orbitron', 'Oxanium', 'Rajdhani', sans-serif;
+  --font-display: 'Orbitron', 'Oxanium', 'Rajdhani', sans-serif;
+  --font-tech:    'Rajdhani', 'Orbitron', sans-serif;
   --font-ui:      'Inter', system-ui, sans-serif;
+  --font-sans:    'Inter', system-ui, sans-serif;
 
   /* Spacing */
   --container-max: 1280px;

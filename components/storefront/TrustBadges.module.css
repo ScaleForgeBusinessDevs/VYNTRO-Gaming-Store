@@ -40,14 +40,14 @@
 
 /* Main title */
 .title {
-  font-family: var(--font-sans), sans-serif;
-  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-family: var(--font-cyber, 'Orbitron'), 'Oxanium', sans-serif;
+  font-size: clamp(1.8rem, 3.6vw, 3rem);
   font-weight: 900;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #FFFFFF;
   margin: 0;
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .titleAccent {

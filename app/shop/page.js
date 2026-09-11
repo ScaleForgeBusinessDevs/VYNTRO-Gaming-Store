@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/storefront/Navbar';
 import Footer from '@/components/storefront/Footer';
 import ProductCard from '@/components/storefront/ProductCard';
+import CyberpunkPageHeader from '@/components/storefront/CyberpunkPageHeader';
 import styles from './shop.module.css';
 
 const CATEGORIES = [
@@ -100,20 +101,14 @@ function ShopContent() {
 
   return (
     <div className="container">
-      {/* Page header — Centered, Big, Bold */}
-      <div className={styles.header}>
-        <div className={styles.eyebrow}>
-          <span className={styles.eyebrowLine} />
-          <span className={styles.eyebrowText}>VYNTRO ARSENAL // CATALOG</span>
-          <span className={styles.eyebrowLine} />
-        </div>
-        <h1 className={styles.title}>
-          OUR <span className={styles.titleAccent}>COLLECTION</span>
-        </h1>
-        <p className={styles.subtitle}>
-          High-performance gaming deskmats and peripheral gear built for competitive precision and clean desktop aesthetics.
-        </p>
-      </div>
+      {/* Cyberpunk Modern Header */}
+      <CyberpunkPageHeader
+        eyebrow="VYNTRO ARSENAL // GEAR ARCHIVE"
+        titlePrefix="OUR"
+        titleAccent="COLLECTION"
+        description="High-performance gaming deskmats, keyboards, mice, and audiophile gear built for competitive precision and clean desktop aesthetics."
+        code="CATALOG 2026"
+      />
 
       {/* Filter Tabs */}
       <div className={styles.filters} role="tablist" aria-label="Filter products">

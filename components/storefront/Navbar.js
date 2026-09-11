@@ -12,7 +12,7 @@ const NAV_LINKS = [
   { label: 'MICE', href: '/mice' },
   { label: 'KEYBOARDS', href: '/keyboards' },
   { label: 'IEMS', href: '/iems' },
-  { label: 'HEADPHONES', href: '/headphones' },
+  // { label: 'HEADPHONES', href: '/headphones' },
   { label: 'ACCESSORIES', href: '/accessories' },
 ];
 

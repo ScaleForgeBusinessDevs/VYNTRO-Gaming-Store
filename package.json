@@ -18,5 +18,8 @@
     "resend": "^6.26.0",
     "sharp": "^0.35.4",
     "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "shadcn": "^4.21.0"
   }
 }

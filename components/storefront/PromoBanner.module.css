@@ -85,12 +85,12 @@
 }
 
 .headline {
-  font-family: var(--font-sans), sans-serif;
-  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-family: var(--font-cyber, 'Orbitron'), 'Oxanium', sans-serif;
+  font-size: clamp(1.8rem, 3.6vw, 3rem);
   font-weight: 900;
   color: #FFFFFF;
-  line-height: 1.05;
-  letter-spacing: 0.02em;
+  line-height: 1.1;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   margin: 0;
 }

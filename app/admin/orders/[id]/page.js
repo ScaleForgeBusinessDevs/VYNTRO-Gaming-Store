@@ -68,9 +68,19 @@ export default function OrderDetailPage() {
         </div>
         <div className={styles.profitPill}>
           <span className="label muted">Profit</span>
-          <span style={{ color: profit >= 0 ? 'var(--success)' : 'var(--danger)', fontWeight: 700 }}>
-            PKR {profit.toLocaleString()} ({(order.profit_margin ?? 0).toFixed(1)}%)
-          </span>
+          {order.status === 'Cancelled' ? (
+            <span style={{ color: 'var(--danger)', fontWeight: 700 }}>
+              Voided (Order Cancelled)
+            </span>
+          ) : order.status === 'Returned' ? (
+            <span style={{ color: 'var(--warning)', fontWeight: 700 }}>
+              Refunded (Returned)
+            </span>
+          ) : (
+            <span style={{ color: profit >= 0 ? 'var(--success)' : 'var(--danger)', fontWeight: 700 }}>
+              PKR {profit.toLocaleString()} ({(order.profit_margin ?? 0).toFixed(1)}%)
+            </span>
+          )}
         </div>
       </div>
 

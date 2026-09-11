@@ -130,7 +130,7 @@ const INITIAL_MICE = [
 export default function MicePage() {
   return (
     <CategoryStorePage
-      eyebrow="8000HZ POLLING // ULTRA-LIGHTWEIGHT ERGONOMICS"
+      // eyebrow="8000HZ POLLING // ULTRA-LIGHTWEIGHT ERGONOMICS"
       titlePrefix="COMPETITIVE"
       titleAccent="MICE"
       description="Zero latency, featherweight shells, and flagship optical sensors. Multi-filter by your exact grip style and wireless/wired setup."

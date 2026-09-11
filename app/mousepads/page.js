@@ -148,7 +148,7 @@ const INITIAL_MOUSEPADS = [
 export default function MousepadsPage() {
   return (
     <CategoryStorePage
-      eyebrow="COMPETITIVE ESPORTS SURFACES // SPEED & CONTROL"
+      // eyebrow="COMPETITIVE ESPORTS SURFACES // SPEED & CONTROL"
       titlePrefix="PRECISION"
       titleAccent="DESKMATS"
       description="Custom-crafted 900×400mm tournament deskmats engineered for zero-drag glide, pixel-precise tracking, and desk aesthetic perfection."

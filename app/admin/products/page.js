@@ -148,6 +148,20 @@ export default function AdminProductsPage() {
     } catch (e) { console.error(e); }
   }
 
+  async function toggleStock(id, currentStock) {
+    const newStock = (currentStock ?? 0) === 0 ? 15 : 0;
+    try {
+      const res = await fetch(`/api/admin/products/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stock_quantity: newStock }),
+      });
+      if (res.ok) {
+        setProducts((prev) => prev.map((p) => p.id === id ? { ...p, stock_quantity: newStock } : p));
+      }
+    } catch (e) { console.error(e); }
+  }
+
   async function handleDelete(id, name) {
     const confirmed = window.confirm(`Are you sure you want to permanently delete "${name}"?`);
     if (!confirmed) return;
@@ -421,12 +435,33 @@ export default function AdminProductsPage() {
                           : <span className={styles.none}>—</span>}
                       </td>
                       <td>
-                        <span className={`stock-badge ${
-                          p.stock_quantity === 0 ? 'out-of-stock' :
-                          p.stock_quantity <= 5  ? 'low-stock' : 'in-stock'
-                        }`}>
-                          {p.stock_quantity === 0 ? 'Out' : p.stock_quantity <= 5 ? `${p.stock_quantity} left` : p.stock_quantity}
-                        </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
+                          <span className={`stock-badge ${
+                            p.stock_quantity === 0 ? 'out-of-stock' :
+                            p.stock_quantity <= 5  ? 'low-stock' : 'in-stock'
+                          }`}>
+                            {p.stock_quantity === 0 ? 'Out' : p.stock_quantity <= 5 ? `${p.stock_quantity} left` : p.stock_quantity}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => toggleStock(p.id, p.stock_quantity)}
+                            title={p.stock_quantity === 0 ? 'Mark as In Stock (15)' : 'Mark as Out of Stock (0)'}
+                            style={{
+                              fontSize: '0.62rem',
+                              padding: '2px 6px',
+                              background: p.stock_quantity === 0 ? 'rgba(34, 197, 94, 0.15)' : 'rgba(230, 0, 18, 0.12)',
+                              color: p.stock_quantity === 0 ? 'var(--success)' : '#FF6B6B',
+                              border: p.stock_quantity === 0 ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(230, 0, 18, 0.3)',
+                              borderRadius: '3px',
+                              cursor: 'pointer',
+                              fontWeight: 700,
+                              whiteSpace: 'nowrap',
+                              lineHeight: 1.2,
+                            }}
+                          >
+                            {p.stock_quantity === 0 ? '✓ Restock' : '✕ Out of Stock'}
+                          </button>
+                        </div>
                       </td>
                       <td>
                         <button

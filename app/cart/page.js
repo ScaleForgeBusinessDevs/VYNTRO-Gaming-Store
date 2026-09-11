@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Navbar from '@/components/storefront/Navbar';
 import Footer from '@/components/storefront/Footer';
+import CyberpunkPageHeader from '@/components/storefront/CyberpunkPageHeader';
 import useCartStore from '@/lib/cartStore';
 import styles from './cart.module.css';
 
@@ -20,16 +21,14 @@ export default function CartPage() {
       <Navbar />
       <main className={styles.main}>
         <div className="container">
-          <div className={styles.header}>
-            <div className={styles.eyebrow}>
-              <span className={styles.eyebrowLine} />
-              <span className={styles.eyebrowText}>REVIEW YOUR SELECTION</span>
-              <span className={styles.eyebrowLine} />
-            </div>
-            <h1 className={styles.title}>
-              YOUR <span className={styles.titleAccent}>CART</span>
-            </h1>
-          </div>
+          {/* Cyberpunk Modern Header */}
+          <CyberpunkPageHeader
+            eyebrow="TRANSACTION TERMINAL // LOADOUT"
+            titlePrefix="YOUR"
+            titleAccent="CART"
+            description="Review your tactical hardware selection before proceeding to secure checkout dispatch."
+            code="LOADOUT CONFIRM"
+          />
 
           {items.length === 0 ? (
             <div className={styles.empty}>

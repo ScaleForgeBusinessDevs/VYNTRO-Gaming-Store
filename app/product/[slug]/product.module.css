@@ -225,12 +225,13 @@
 
 /* Product name */
 .productName {
-  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-family: var(--font-cyber, 'Orbitron'), 'Oxanium', sans-serif;
+  font-size: clamp(1.4rem, 3.2vw, 2.2rem);
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: #fff;
   text-transform: uppercase;
-  line-height: 1.1;
+  line-height: 1.18;
   margin: 0 0 16px;
 }
 
@@ -336,6 +337,26 @@
 .sizeBtnActive {
   border-color: var(--accent, #E60012) !important;
   background: rgba(230, 0, 18, 0.1) !important;
+}
+
+.sizeBtnDisabled {
+  opacity: 0.42;
+  cursor: not-allowed !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.01) !important;
+  pointer-events: none;
+}
+.sizeBtnDisabled:hover {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.01) !important;
+}
+
+.sizeUnavailableBadge {
+  font-size: 0.62rem;
+  color: #FF6B6B;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .popularDot {
@@ -588,3 +609,150 @@
   color: rgba(255, 255, 255, 0.4);
   letter-spacing: 0.03em;
 }
+
+/* ── Out of Stock Alert & Unavailable Page Elements ── */
+.outOfStockAlert {
+  background: linear-gradient(135deg, rgba(230, 0, 18, 0.12), rgba(26, 10, 12, 0.6));
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  border-radius: 4px;
+  padding: 14px 18px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 0 20px rgba(230, 0, 18, 0.15);
+}
+
+.outOfStockAlertHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display, 'Rajdhani'), sans-serif;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #FF6B6B;
+  text-transform: uppercase;
+}
+
+.outOfStockAlertDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FF334B;
+  box-shadow: 0 0 8px #FF334B;
+  animation: pulseRed 1.8s infinite ease-in-out;
+}
+
+@keyframes pulseRed {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+
+.outOfStockAlertDesc {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.unavailableBox {
+  background: rgba(26, 16, 18, 0.7);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 4px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  backdrop-filter: blur(8px);
+}
+
+.unavailableStatusRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.unavailableIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.unavailableTitle {
+  font-family: var(--font-display, 'Rajdhani'), sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #FF6B6B;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+
+.unavailableSubtitle {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.unavailableActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.browseAltBtn {
+  background: linear-gradient(135deg, #E60012, #B8000E);
+  color: #FFFFFF;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 2px;
+  box-shadow: 0 4px 14px rgba(230, 0, 18, 0.35);
+  transition: all 0.2s;
+}
+.browseAltBtn:hover {
+  box-shadow: 0 6px 20px rgba(230, 0, 18, 0.55);
+  transform: translateY(-1px);
+}
+
+.returnHomeBtn {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+.returnHomeBtn:hover {
+  color: #FFF;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.galleryOutOfStockOverlay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  background: linear-gradient(135deg, rgba(230, 0, 18, 0.95), rgba(184, 0, 14, 0.95));
+  color: #FFFFFF;
+  font-family: var(--font-display, 'Rajdhani'), sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 4px;
+  box-shadow: 0 4px 20px rgba(230, 0, 18, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(8px);
+}
+

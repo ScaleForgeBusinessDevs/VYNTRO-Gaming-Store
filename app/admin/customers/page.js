@@ -22,10 +22,14 @@ export default function AdminCustomersPage() {
           const c = o.customers;
           if (!c) return;
           if (!map[c.id]) {
-            map[c.id] = { ...c, orderCount: 0, totalSpend: 0 };
+            map[c.id] = { ...c, orderCount: 0, validOrderCount: 0, totalSpend: 0 };
           }
-          map[c.id].orderCount  += 1;
-          map[c.id].totalSpend  += o.total_amount ?? 0;
+          map[c.id].orderCount += 1;
+          // Only valid non-cancelled orders contribute to lifetime spend
+          if (o.status !== 'Cancelled' && o.status !== 'Returned') {
+            map[c.id].validOrderCount += 1;
+            map[c.id].totalSpend += o.total_amount ?? 0;
+          }
         });
 
         setCustomers(

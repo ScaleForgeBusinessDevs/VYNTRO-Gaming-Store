@@ -116,7 +116,7 @@ const INITIAL_KEYBOARDS = [
 export default function KeyboardsPage() {
   return (
     <CategoryStorePage
-      eyebrow="RAPID TRIGGER // MAGNETIC HALL EFFECT PERFORMANCE"
+      // eyebrow="RAPID TRIGGER // MAGNETIC HALL EFFECT PERFORMANCE"
       titlePrefix="MECHANICAL & HE"
       titleAccent="KEYBOARDS"
       description="Magnetic Hall Effect rapid trigger boards and custom acoustic gasket mounts. Dial in actuation down to 0.1mm."

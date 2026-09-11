@@ -111,7 +111,7 @@ const INITIAL_ACCESSORIES = [
 export default function AccessoriesPage() {
   return (
     <CategoryStorePage
-      eyebrow="DESK RIG UPGRADES // AVIATOR CABLES & WRIST RESTS"
+      // eyebrow="DESK RIG UPGRADES // AVIATOR CABLES & WRIST RESTS"
       titlePrefix="PERIPHERAL"
       titleAccent="ACCESSORIES"
       description="Refine your setup aesthetics and ergonomics with artisan coiled aviator cables, acoustic-grade wrist rests, and friction-free glass skates."

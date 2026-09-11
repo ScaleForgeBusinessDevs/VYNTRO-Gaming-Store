@@ -586,9 +586,9 @@ export default function ProductFormPage({ isEdit = false }) {
       const cleanSizePricing = {};
       if (activeType === 'Mousepads') {
         ['Basic', 'Large', 'XL', 'XXL', 'XXXL'].forEach((s) => {
-          if (sizePricing[s]) {
+          if (sizePricing[s] !== undefined && sizePricing[s] !== '') {
             const num = Number(sizePricing[s]);
-            if (!isNaN(num) && num > 0) {
+            if (!isNaN(num) && num >= 0) {
               cleanSizePricing[s] = num;
             }
           }
@@ -927,7 +927,7 @@ export default function ProductFormPage({ isEdit = false }) {
                       <div>
                         <span className={styles.subgroupTitle}>MOUSEPAD SIZES & PRICEPOINTS (PKR)</span>
                         <p className="body-xs muted" style={{ margin: '2px 0 0' }}>
-                          Set prices for Basic, Large, XL, XXL, and XXXL sizes. The customer picks their size on the product page.
+                          Set prices for Basic, Large, XL, XXL, and XXXL sizes. <strong>Set price to 0</strong> to mark that size as unavailable.
                         </p>
                       </div>
                       <button
@@ -941,30 +941,48 @@ export default function ProductFormPage({ isEdit = false }) {
                     </div>
 
                     <div className={styles.sizePricingGrid}>
-                      {MOUSEPAD_SIZES.map((sz) => (
-                        <div key={sz.id} className={styles.sizePricingCard}>
-                          <div className={styles.sizeCardHeader}>
-                            <span className={styles.sizeCardName}>{sz.label}</span>
-                            <span className={styles.sizeCardDims}>{sz.dims}</span>
+                      {MOUSEPAD_SIZES.map((sz) => {
+                        const rawVal = sizePricing[sz.id];
+                        const isZero = rawVal !== undefined && rawVal !== '' && Number(rawVal) === 0;
+                        return (
+                          <div
+                            key={sz.id}
+                            className={`${styles.sizePricingCard} ${isZero ? styles.sizePricingCardZero : ''}`}
+                          >
+                            <div className={styles.sizeCardHeader}>
+                              <span className={styles.sizeCardName}>{sz.label}</span>
+                              <span className={styles.sizeCardDims}>{sz.dims}</span>
+                              {isZero && (
+                                <span
+                                  className="badge badge-danger"
+                                  style={{ fontSize: '0.62rem', padding: '1px 6px', fontWeight: 700 }}
+                                >
+                                  Unavailable (0)
+                                </span>
+                              )}
+                            </div>
+                            <div className={styles.sizeInputWrap}>
+                              <span className={styles.sizeCurrency}>PKR</span>
+                              <input
+                                type="number"
+                                min="0"
+                                step="100"
+                                placeholder={
+                                  form.selling_price
+                                    ? String(Math.max(999, (Number(form.selling_price) || 2999) + sz.defaultDiff))
+                                    : '2499'
+                                }
+                                value={sizePricing[sz.id] ?? ''}
+                                onChange={(e) => handleSizePriceChange(sz.id, e.target.value)}
+                                className={styles.sizeInputField}
+                              />
+                            </div>
+                            <p className="body-xs muted" style={{ margin: '4px 0 0', fontSize: '0.68rem' }}>
+                              {isZero ? 'Marked Unavailable on storefront' : 'Enter 0 to mark unavailable'}
+                            </p>
                           </div>
-                          <div className={styles.sizeInputWrap}>
-                            <span className={styles.sizeCurrency}>PKR</span>
-                            <input
-                              type="number"
-                              min="0"
-                              step="100"
-                              placeholder={
-                                form.selling_price
-                                  ? String(Math.max(999, (Number(form.selling_price) || 2999) + sz.defaultDiff))
-                                  : '2499'
-                              }
-                              value={sizePricing[sz.id] || ''}
-                              onChange={(e) => handleSizePriceChange(sz.id, e.target.value)}
-                              className={styles.sizeInputField}
-                            />
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -1279,7 +1297,31 @@ export default function ProductFormPage({ isEdit = false }) {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label" htmlFor="product-stock">Stock Quantity *</label>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <label className="form-label" htmlFor="product-stock" style={{ margin: 0 }}>Stock Quantity *</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const current = parseInt(form.stock_quantity) || 0;
+                        setForm((prev) => ({
+                          ...prev,
+                          stock_quantity: current === 0 ? '15' : '0',
+                        }));
+                      }}
+                      className="badge"
+                      style={{
+                        cursor: 'pointer',
+                        background: (parseInt(form.stock_quantity) || 0) === 0 ? 'rgba(230, 0, 18, 0.25)' : 'rgba(255, 255, 255, 0.08)',
+                        color: (parseInt(form.stock_quantity) || 0) === 0 ? '#FF6B6B' : 'var(--text-secondary)',
+                        border: (parseInt(form.stock_quantity) || 0) === 0 ? '1px solid #FF6B6B' : '1px solid var(--border-subtle)',
+                        fontSize: '0.68rem',
+                        padding: '3px 8px',
+                        fontWeight: 700,
+                      }}
+                    >
+                      {(parseInt(form.stock_quantity) || 0) === 0 ? '✓ Mark as In Stock' : '🚫 Mark Out of Stock'}
+                    </button>
+                  </div>
                   <input
                     id="product-stock"
                     name="stock_quantity"
@@ -1291,6 +1333,11 @@ export default function ProductFormPage({ isEdit = false }) {
                     value={form.stock_quantity}
                     onChange={handleChange}
                   />
+                  {(parseInt(form.stock_quantity) || 0) === 0 && (
+                    <p className="body-xs" style={{ color: 'var(--danger)', margin: '4px 0 0', fontWeight: 600 }}>
+                      ⚠️ Product is marked OUT OF STOCK. The storefront card will show an Out of Stock banner and its product page will be made unavailable.
+                    </p>
+                  )}
                   {errors.stock_quantity && <p className="form-error">{errors.stock_quantity}</p>}
                 </div>
               </div>

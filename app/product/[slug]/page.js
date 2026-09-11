@@ -158,14 +158,16 @@ export default function ProductPage() {
         setProduct(loaded);
         if (isMousepadProduct(loaded)) {
           const sizes = getProductSizeVariants(loaded);
-          setSelectedSize(sizes.find((s) => s.id === 'XXL') || sizes[0] || null);
+          const available = sizes.filter((s) => s.isAvailable);
+          setSelectedSize(available.find((s) => s.id === 'XXL') || available[0] || null);
         }
         const colors = getColorVariants(loaded);
         if (colors.length > 0) setSelectedColor(colors[0]);
       } catch {
         setProduct(PLACEHOLDER);
         const sizes = getProductSizeVariants(PLACEHOLDER);
-        setSelectedSize(sizes.find((s) => s.id === 'XXL') || sizes[0]);
+        const available = sizes.filter((s) => s.isAvailable);
+        setSelectedSize(available.find((s) => s.id === 'XXL') || available[0] || null);
       }
     };
     load();
@@ -201,15 +203,18 @@ export default function ProductPage() {
   }
 
   /* Pricing */
-  const activeBasePrice = selectedSize ? selectedSize.price : product.selling_price;
+  const isOutOfStock = (product.stock_quantity ?? 0) === 0;
+  const isSizeUnavailable = isMousepad && (!selectedSize || !selectedSize.isAvailable || selectedSize.effectivePrice <= 0);
+  const activeBasePrice = selectedSize && selectedSize.isAvailable ? selectedSize.price : product.selling_price;
   const colorPriceDiff = selectedColor?.priceDiff ?? 0;
   const priceWithColor = activeBasePrice + colorPriceDiff;
-  const discountedPrice = product.discount_percentage
+  const discountedPrice = !isSizeUnavailable && product.discount_percentage
     ? Math.round(priceWithColor * (1 - product.discount_percentage / 100))
     : null;
   const displayPrice = discountedPrice ?? priceWithColor;
 
   function handleAddToCart() {
+    if (isOutOfStock || isSizeUnavailable) return;
     addItem(product, qty, selectedSize, selectedColor);
     setAdded(true);
     setTimeout(() => setAdded(false), 2200);
@@ -243,8 +248,13 @@ export default function ProductPage() {
           {/* ══════════════════════════════════════════════════
               LEFT — Sticky Image Gallery (Desktop)
           ═══════════════════════════════════════════════════ */}
-          <div className={styles.galleryCol}>
+          <div className={styles.galleryCol} style={{ position: 'relative' }}>
             <ProductBreadcrumb productName={product.name} />
+            {isOutOfStock && (
+              <div className={styles.galleryOutOfStockOverlay}>
+                OUT OF STOCK // UNAVAILABLE
+              </div>
+            )}
             <GallerySection
               currentImg={currentImg}
               galleryImages={galleryImages}
@@ -262,6 +272,19 @@ export default function ProductPage() {
             <div className={styles.mobileBreadcrumb}>
               <ProductBreadcrumb productName={product.name} />
             </div>
+
+            {/* Out of Stock Alert Banner */}
+            {isOutOfStock && (
+              <div className={styles.outOfStockAlert}>
+                <div className={styles.outOfStockAlertHeader}>
+                  <span className={styles.outOfStockAlertDot} />
+                  <span>PRODUCT CURRENTLY OUT OF STOCK // UNAVAILABLE</span>
+                </div>
+                <p className={styles.outOfStockAlertDesc}>
+                  This product is currently out of stock and unavailable for ordering. Check back soon for restocks or explore our active catalog.
+                </p>
+              </div>
+            )}
 
             {/* Category + Stock */}
             <div className={styles.topRow}>
@@ -291,33 +314,39 @@ export default function ProductPage() {
             <div className={styles.divider} />
 
             {/* Size selector — only for mousepads */}
-            {isMousepad && sizeVariants.length > 0 && (
+            {isMousepad && (
               <div className={styles.selectorSection} id="pdp-size-selector">
                 <div className={styles.selectorHeader}>
                   <span className={styles.selectorLabel}>SELECT SIZE</span>
                   <span className={styles.selectorValue}>
-                    {selectedSize ? `${selectedSize.label} — ${selectedSize.dims}` : '—'}
+                    {selectedSize ? `${selectedSize.label} — ${selectedSize.dims}` : 'No sizes available'}
                   </span>
                 </div>
-                <div className={styles.sizeGrid}>
-                  {sizeVariants.map((sz) => {
-                    const isActive = selectedSize?.id === sz.id;
-                    return (
-                      <button
-                        key={sz.id}
-                        type="button"
-                        className={`${styles.sizeBtn} ${isActive ? styles.sizeBtnActive : ''}`}
-                        onClick={() => setSelectedSize(sz)}
-                        id={`size-btn-${sz.id.toLowerCase()}`}
-                      >
-                        {sz.popular && <span className={styles.popularDot} />}
-                        <span className={styles.sizeBtnLabel}>{sz.label}</span>
-                        <span className={styles.sizeBtnDims}>{sz.dims}</span>
-                        <span className={styles.sizeBtnPrice}>PKR {sz.effectivePrice.toLocaleString()}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+                {sizeVariants.length === 0 ? (
+                  <p className="body-xs" style={{ color: 'var(--danger)', margin: '4px 0 0' }}>
+                    All sizes for this product are currently unavailable.
+                  </p>
+                ) : (
+                  <div className={styles.sizeGrid}>
+                    {sizeVariants.map((sz) => {
+                      const isActive = selectedSize?.id === sz.id;
+                      return (
+                        <button
+                          key={sz.id}
+                          type="button"
+                          className={`${styles.sizeBtn} ${isActive ? styles.sizeBtnActive : ''}`}
+                          onClick={() => setSelectedSize(sz)}
+                          id={`size-btn-${sz.id.toLowerCase()}`}
+                        >
+                          {sz.popular && <span className={styles.popularDot} />}
+                          <span className={styles.sizeBtnLabel}>{sz.label}</span>
+                          <span className={styles.sizeBtnDims}>{sz.dims}</span>
+                          <span className={styles.sizeBtnPrice}>PKR {sz.effectivePrice.toLocaleString()}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
 
@@ -406,57 +435,81 @@ export default function ProductPage() {
 
             <div className={styles.divider} />
 
-            {/* Quantity + Add to Cart */}
-            <div className={styles.ctaRow}>
-              {/* Qty control */}
-              <div className={styles.qtyControl}>
-                <button
-                  className={styles.qtyBtn}
-                  onClick={() => setQty(Math.max(1, qty - 1))}
-                  disabled={qty <= 1}
-                  aria-label="Decrease quantity"
-                >−</button>
-                <span className={styles.qtyNum}>{qty}</span>
-                <button
-                  className={styles.qtyBtn}
-                  onClick={() => setQty(qty + 1)}
-                  disabled={qty >= product.stock_quantity}
-                  aria-label="Increase quantity"
-                >+</button>
+            {/* Quantity + Add to Cart (Or Unavailable Box) */}
+            {isOutOfStock ? (
+              <div className={styles.unavailableBox}>
+                <div className={styles.unavailableStatusRow}>
+                  <span className={styles.unavailableIcon}>🚫</span>
+                  <div>
+                    <p className={styles.unavailableTitle}>PRODUCT UNAVAILABLE FOR PURCHASE</p>
+                    <p className={styles.unavailableSubtitle}>
+                      This item is currently out of stock. You cannot add it to cart or place orders.
+                    </p>
+                  </div>
+                </div>
+                <div className={styles.unavailableActions}>
+                  <Link href={`/${product.category?.toLowerCase() || 'shop'}`} className={styles.browseAltBtn}>
+                    Browse Available {product.category || 'Gear'} →
+                  </Link>
+                  <Link href="/" className={styles.returnHomeBtn}>
+                    Return to Storefront
+                  </Link>
+                </div>
               </div>
+            ) : (
+              <>
+                <div className={styles.ctaRow}>
+                  {/* Qty control */}
+                  <div className={styles.qtyControl}>
+                    <button
+                      className={styles.qtyBtn}
+                      onClick={() => setQty(Math.max(1, qty - 1))}
+                      disabled={qty <= 1}
+                      aria-label="Decrease quantity"
+                    >−</button>
+                    <span className={styles.qtyNum}>{qty}</span>
+                    <button
+                      className={styles.qtyBtn}
+                      onClick={() => setQty(qty + 1)}
+                      disabled={qty >= product.stock_quantity}
+                      aria-label="Increase quantity"
+                    >+</button>
+                  </div>
 
-              {/* Add to cart */}
-              <button
-                className={`${styles.addBtn} ${added ? styles.addBtnAdded : ''}`}
-                onClick={handleAddToCart}
-                disabled={product.stock_quantity === 0}
-                id="pdp-add-to-cart"
-              >
-                {added
-                  ? '✓ ADDED'
-                  : product.stock_quantity === 0
-                    ? 'OUT OF STOCK'
-                    : 'ADD TO CART'}
-              </button>
-            </div>
+                  {/* Add to cart */}
+                  <button
+                    className={`${styles.addBtn} ${added ? styles.addBtnAdded : ''}`}
+                    onClick={handleAddToCart}
+                    disabled={isSizeUnavailable}
+                    id="pdp-add-to-cart"
+                  >
+                    {added
+                      ? '✓ ADDED'
+                      : isSizeUnavailable
+                        ? 'SIZE UNAVAILABLE'
+                        : 'ADD TO CART'}
+                  </button>
+                </div>
 
-            {/* Price total below CTA */}
-            {qty > 1 && (
-              <p className={styles.totalNote}>
-                Total: <strong>PKR {(displayPrice * qty).toLocaleString()}</strong>
-              </p>
+                {/* Price total below CTA */}
+                {qty > 1 && (
+                  <p className={styles.totalNote}>
+                    Total: <strong>PKR {(displayPrice * qty).toLocaleString()}</strong>
+                  </p>
+                )}
+
+                {/* WhatsApp */}
+                <a
+                  href={`https://wa.me/923363791538?text=${encodeURIComponent(waMessage)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.waBtn}
+                  id="pdp-whatsapp-btn"
+                >
+                  <WAIcon /> ORDER VIA WHATSAPP
+                </a>
+              </>
             )}
-
-            {/* WhatsApp */}
-            <a
-              href={`https://wa.me/923363791538?text=${encodeURIComponent(waMessage)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.waBtn}
-              id="pdp-whatsapp-btn"
-            >
-              <WAIcon /> ORDER VIA WHATSAPP
-            </a>
 
             {/* COD */}
             <div className={styles.codBadge}>
